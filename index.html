@@ -6,675 +6,594 @@
 <title>UEFA Champions Putos 2026</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950">
-<div id="root"></div>
+<div id="root">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;color:#fbbf24;font-family:sans-serif;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;font-size:14px;">
+    Carregando...
+  </div>
+</div>
 
-<script type="text/babel" data-presets="react">
+<script>
+"use strict";
 const { useState, useEffect, useMemo, useCallback } = React;
-
 // >>> URL do seu Firebase Realtime Database <<<
 const FIREBASE_URL = "https://uefa-champions-putos-default-rtdb.firebaseio.com";
-
 const uid = () => Math.random().toString(36).slice(2, 10);
-
 const TEAMS_SEED = [
-  { id: "27746083", nome: "Monique Moura F.C" },
-  { id: "4268482", nome: "DONOVAN F.C." },
-  { id: "776045", nome: "PARANA CLUBE PG" },
-  { id: "13990982", nome: "SAF VK Phone" },
-  { id: "4749372", nome: "LAVINI SPFC" },
-  { id: "555279", nome: "Fatique FC" },
-  { id: "2182848", nome: "Dalmo&Arthur" },
-  { id: "1785663", nome: "Saint Pablo SPFC" },
-  { id: "44741890", nome: "Real Mauadri" },
-  { id: "95344", nome: "Ayrton Senna Eterno F. C." },
-  { id: "26771693", nome: "Mariotio FC" },
-  { id: "2515690", nome: "SAMURAI F.C." },
-  { id: "702112", nome: "F.C.COM NOS NINGUEM PODE" },
-  { id: "3208913", nome: "CORAGEM 2015" },
-  { id: "15442388", nome: "C.A. MALAAS" },
-  { id: "30073408", nome: "Sport Club Mestre Chimba" },
-  { id: "3845725", nome: "Impondo Azul" },
-  { id: "1682666", nome: "Sep Palmeirinhas FC" },
-  { id: "2658666", nome: "Gandula Centroavante FC" },
-  { id: "4077185", nome: "SEP PALMEIRAS 19I4" },
-  { id: "50846102", nome: "MeuVerde Eli" },
-  { id: "8176909", nome: "Avalanxe FC" },
-  { id: "18064977", nome: "todenovo f.c" },
-  { id: "51028350", nome: "sep fut maua" },
-  { id: "45850044", nome: "lcferreira 18 fc" },
-  { id: "18930543", nome: "tricolormarcosfc" },
+    { id: "27746083", nome: "Monique Moura F.C" },
+    { id: "4268482", nome: "DONOVAN F.C." },
+    { id: "776045", nome: "PARANA CLUBE PG" },
+    { id: "13990982", nome: "SAF VK Phone" },
+    { id: "4749372", nome: "LAVINI SPFC" },
+    { id: "555279", nome: "Fatique FC" },
+    { id: "2182848", nome: "Dalmo&Arthur" },
+    { id: "1785663", nome: "Saint Pablo SPFC" },
+    { id: "44741890", nome: "Real Mauadri" },
+    { id: "95344", nome: "Ayrton Senna Eterno F. C." },
+    { id: "26771693", nome: "Mariotio FC" },
+    { id: "2515690", nome: "SAMURAI F.C." },
+    { id: "702112", nome: "F.C.COM NOS NINGUEM PODE" },
+    { id: "3208913", nome: "CORAGEM 2015" },
+    { id: "15442388", nome: "C.A. MALAAS" },
+    { id: "30073408", nome: "Sport Club Mestre Chimba" },
+    { id: "3845725", nome: "Impondo Azul" },
+    { id: "1682666", nome: "Sep Palmeirinhas FC" },
+    { id: "2658666", nome: "Gandula Centroavante FC" },
+    { id: "4077185", nome: "SEP PALMEIRAS 19I4" },
+    { id: "50846102", nome: "MeuVerde Eli" },
+    { id: "8176909", nome: "Avalanxe FC" },
+    { id: "18064977", nome: "todenovo f.c" },
+    { id: "51028350", nome: "sep fut maua" },
+    { id: "45850044", nome: "lcferreira 18 fc" },
+    { id: "18930543", nome: "tricolormarcosfc" },
 ];
-
 const FIXTURES_R1_A_R8 = [
-  [["SEP PALMEIRAS 19I4","lcferreira 18 fc"],["Gandula Centroavante FC","PARANA CLUBE PG"],["Avalanxe FC","Impondo Azul"],["Fatique FC","tricolormarcosfc"],["Mariotio FC","Sep Palmeirinhas FC"],["CORAGEM 2015","Monique Moura F.C"],["Dalmo&Arthur","SAMURAI F.C."],["C.A. MALAAS","Real Mauadri"],["MeuVerde Eli","Saint Pablo SPFC"],["todenovo f.c","sep fut maua"],["DONOVAN F.C.","SAF VK Phone"],["Ayrton Senna Eterno F. C.","Sport Club Mestre Chimba"],["F.C.COM NOS NINGUEM PODE","LAVINI SPFC"]],
-  [["lcferreira 18 fc","sep fut maua"],["Fatique FC","MeuVerde Eli"],["Dalmo&Arthur","todenovo f.c"],["Mariotio FC","tricolormarcosfc"],["SAMURAI F.C.","SEP PALMEIRAS 19I4"],["Avalanxe FC","Gandula Centroavante FC"],["Ayrton Senna Eterno F. C.","Impondo Azul"],["C.A. MALAAS","DONOVAN F.C."],["CORAGEM 2015","F.C.COM NOS NINGUEM PODE"],["Saint Pablo SPFC","Sport Club Mestre Chimba"],["LAVINI SPFC","SAF VK Phone"],["PARANA CLUBE PG","Sep Palmeirinhas FC"],["Monique Moura F.C","Real Mauadri"]],
-  [["Saint Pablo SPFC","tricolormarcosfc"],["Avalanxe FC","F.C.COM NOS NINGUEM PODE"],["C.A. MALAAS","PARANA CLUBE PG"],["Monique Moura F.C","Sport Club Mestre Chimba"],["MeuVerde Eli","SAF VK Phone"],["Dalmo&Arthur","Real Mauadri"],["DONOVAN F.C.","Fatique FC"],["LAVINI SPFC","SEP PALMEIRAS 19I4"],["CORAGEM 2015","lcferreira 18 fc"],["Gandula Centroavante FC","Sep Palmeirinhas FC"],["Ayrton Senna Eterno F. C.","todenovo f.c"],["Mariotio FC","SAMURAI F.C."],["Impondo Azul","sep fut maua"]],
-  [["Ayrton Senna Eterno F. C.","Gandula Centroavante FC"],["MeuVerde Eli","Sport Club Mestre Chimba"],["PARANA CLUBE PG","SEP PALMEIRAS 19I4"],["Impondo Azul","SAMURAI F.C."],["Avalanxe FC","Saint Pablo SPFC"],["CORAGEM 2015","todenovo f.c"],["DONOVAN F.C.","Mariotio FC"],["Fatique FC","sep fut maua"],["F.C.COM NOS NINGUEM PODE","Real Mauadri"],["C.A. MALAAS","Monique Moura F.C"],["Dalmo&Arthur","SAF VK Phone"],["LAVINI SPFC","Sep Palmeirinhas FC"],["lcferreira 18 fc","tricolormarcosfc"]],
-  [["Avalanxe FC","sep fut maua"],["LAVINI SPFC","PARANA CLUBE PG"],["DONOVAN F.C.","todenovo f.c"],["Ayrton Senna Eterno F. C.","SEP PALMEIRAS 19I4"],["Dalmo&Arthur","lcferreira 18 fc"],["Mariotio FC","SAF VK Phone"],["Gandula Centroavante FC","Monique Moura F.C"],["CORAGEM 2015","SAMURAI F.C."],["MeuVerde Eli","Real Mauadri"],["C.A. MALAAS","F.C.COM NOS NINGUEM PODE"],["Fatique FC","Sport Club Mestre Chimba"],["Sep Palmeirinhas FC","tricolormarcosfc"],["Impondo Azul","Saint Pablo SPFC"]],
-  [["Fatique FC","PARANA CLUBE PG"],["Sep Palmeirinhas FC","lcferreira 18 fc"],["LAVINI SPFC","todenovo f.c"],["Real Mauadri","Saint Pablo SPFC"],["DONOVAN F.C.","Impondo Azul"],["Mariotio FC","MeuVerde Eli"],["Avalanxe FC","SAMURAI F.C."],["Monique Moura F.C","SAF VK Phone"],["CORAGEM 2015","Dalmo&Arthur"],["Ayrton Senna Eterno F. C.","tricolormarcosfc"],["C.A. MALAAS","sep fut maua"],["F.C.COM NOS NINGUEM PODE","Sport Club Mestre Chimba"],["Gandula Centroavante FC","SEP PALMEIRAS 19I4"]],
-  [["Ayrton Senna Eterno F. C.","DONOVAN F.C."],["C.A. MALAAS","Mariotio FC"],["F.C.COM NOS NINGUEM PODE","Sep Palmeirinhas FC"],["LAVINI SPFC","sep fut maua"],["Impondo Azul","Real Mauadri"],["CORAGEM 2015","PARANA CLUBE PG"],["Fatique FC","Monique Moura F.C"],["Sport Club Mestre Chimba","todenovo f.c"],["SAMURAI F.C.","Saint Pablo SPFC"],["MeuVerde Eli","tricolormarcosfc"],["Avalanxe FC","lcferreira 18 fc"],["Gandula Centroavante FC","SAF VK Phone"],["Dalmo&Arthur","SEP PALMEIRAS 19I4"]],
-  [["Ayrton Senna Eterno F. C.","CORAGEM 2015"],["LAVINI SPFC","lcferreira 18 fc"],["Real Mauadri","Sport Club Mestre Chimba"],["Avalanxe FC","MeuVerde Eli"],["DONOVAN F.C.","SAMURAI F.C."],["Mariotio FC","PARANA CLUBE PG"],["Monique Moura F.C","sep fut maua"],["SEP PALMEIRAS 19I4","todenovo f.c"],["Dalmo&Arthur","Sep Palmeirinhas FC"],["C.A. MALAAS","SAF VK Phone"],["Fatique FC","Impondo Azul"],["F.C.COM NOS NINGUEM PODE","tricolormarcosfc"],["Gandula Centroavante FC","Saint Pablo SPFC"]],
+    [["SEP PALMEIRAS 19I4", "lcferreira 18 fc"], ["Gandula Centroavante FC", "PARANA CLUBE PG"], ["Avalanxe FC", "Impondo Azul"], ["Fatique FC", "tricolormarcosfc"], ["Mariotio FC", "Sep Palmeirinhas FC"], ["CORAGEM 2015", "Monique Moura F.C"], ["Dalmo&Arthur", "SAMURAI F.C."], ["C.A. MALAAS", "Real Mauadri"], ["MeuVerde Eli", "Saint Pablo SPFC"], ["todenovo f.c", "sep fut maua"], ["DONOVAN F.C.", "SAF VK Phone"], ["Ayrton Senna Eterno F. C.", "Sport Club Mestre Chimba"], ["F.C.COM NOS NINGUEM PODE", "LAVINI SPFC"]],
+    [["lcferreira 18 fc", "sep fut maua"], ["Fatique FC", "MeuVerde Eli"], ["Dalmo&Arthur", "todenovo f.c"], ["Mariotio FC", "tricolormarcosfc"], ["SAMURAI F.C.", "SEP PALMEIRAS 19I4"], ["Avalanxe FC", "Gandula Centroavante FC"], ["Ayrton Senna Eterno F. C.", "Impondo Azul"], ["C.A. MALAAS", "DONOVAN F.C."], ["CORAGEM 2015", "F.C.COM NOS NINGUEM PODE"], ["Saint Pablo SPFC", "Sport Club Mestre Chimba"], ["LAVINI SPFC", "SAF VK Phone"], ["PARANA CLUBE PG", "Sep Palmeirinhas FC"], ["Monique Moura F.C", "Real Mauadri"]],
+    [["Saint Pablo SPFC", "tricolormarcosfc"], ["Avalanxe FC", "F.C.COM NOS NINGUEM PODE"], ["C.A. MALAAS", "PARANA CLUBE PG"], ["Monique Moura F.C", "Sport Club Mestre Chimba"], ["MeuVerde Eli", "SAF VK Phone"], ["Dalmo&Arthur", "Real Mauadri"], ["DONOVAN F.C.", "Fatique FC"], ["LAVINI SPFC", "SEP PALMEIRAS 19I4"], ["CORAGEM 2015", "lcferreira 18 fc"], ["Gandula Centroavante FC", "Sep Palmeirinhas FC"], ["Ayrton Senna Eterno F. C.", "todenovo f.c"], ["Mariotio FC", "SAMURAI F.C."], ["Impondo Azul", "sep fut maua"]],
+    [["Ayrton Senna Eterno F. C.", "Gandula Centroavante FC"], ["MeuVerde Eli", "Sport Club Mestre Chimba"], ["PARANA CLUBE PG", "SEP PALMEIRAS 19I4"], ["Impondo Azul", "SAMURAI F.C."], ["Avalanxe FC", "Saint Pablo SPFC"], ["CORAGEM 2015", "todenovo f.c"], ["DONOVAN F.C.", "Mariotio FC"], ["Fatique FC", "sep fut maua"], ["F.C.COM NOS NINGUEM PODE", "Real Mauadri"], ["C.A. MALAAS", "Monique Moura F.C"], ["Dalmo&Arthur", "SAF VK Phone"], ["LAVINI SPFC", "Sep Palmeirinhas FC"], ["lcferreira 18 fc", "tricolormarcosfc"]],
+    [["Avalanxe FC", "sep fut maua"], ["LAVINI SPFC", "PARANA CLUBE PG"], ["DONOVAN F.C.", "todenovo f.c"], ["Ayrton Senna Eterno F. C.", "SEP PALMEIRAS 19I4"], ["Dalmo&Arthur", "lcferreira 18 fc"], ["Mariotio FC", "SAF VK Phone"], ["Gandula Centroavante FC", "Monique Moura F.C"], ["CORAGEM 2015", "SAMURAI F.C."], ["MeuVerde Eli", "Real Mauadri"], ["C.A. MALAAS", "F.C.COM NOS NINGUEM PODE"], ["Fatique FC", "Sport Club Mestre Chimba"], ["Sep Palmeirinhas FC", "tricolormarcosfc"], ["Impondo Azul", "Saint Pablo SPFC"]],
+    [["Fatique FC", "PARANA CLUBE PG"], ["Sep Palmeirinhas FC", "lcferreira 18 fc"], ["LAVINI SPFC", "todenovo f.c"], ["Real Mauadri", "Saint Pablo SPFC"], ["DONOVAN F.C.", "Impondo Azul"], ["Mariotio FC", "MeuVerde Eli"], ["Avalanxe FC", "SAMURAI F.C."], ["Monique Moura F.C", "SAF VK Phone"], ["CORAGEM 2015", "Dalmo&Arthur"], ["Ayrton Senna Eterno F. C.", "tricolormarcosfc"], ["C.A. MALAAS", "sep fut maua"], ["F.C.COM NOS NINGUEM PODE", "Sport Club Mestre Chimba"], ["Gandula Centroavante FC", "SEP PALMEIRAS 19I4"]],
+    [["Ayrton Senna Eterno F. C.", "DONOVAN F.C."], ["C.A. MALAAS", "Mariotio FC"], ["F.C.COM NOS NINGUEM PODE", "Sep Palmeirinhas FC"], ["LAVINI SPFC", "sep fut maua"], ["Impondo Azul", "Real Mauadri"], ["CORAGEM 2015", "PARANA CLUBE PG"], ["Fatique FC", "Monique Moura F.C"], ["Sport Club Mestre Chimba", "todenovo f.c"], ["SAMURAI F.C.", "Saint Pablo SPFC"], ["MeuVerde Eli", "tricolormarcosfc"], ["Avalanxe FC", "lcferreira 18 fc"], ["Gandula Centroavante FC", "SAF VK Phone"], ["Dalmo&Arthur", "SEP PALMEIRAS 19I4"]],
+    [["Ayrton Senna Eterno F. C.", "CORAGEM 2015"], ["LAVINI SPFC", "lcferreira 18 fc"], ["Real Mauadri", "Sport Club Mestre Chimba"], ["Avalanxe FC", "MeuVerde Eli"], ["DONOVAN F.C.", "SAMURAI F.C."], ["Mariotio FC", "PARANA CLUBE PG"], ["Monique Moura F.C", "sep fut maua"], ["SEP PALMEIRAS 19I4", "todenovo f.c"], ["Dalmo&Arthur", "Sep Palmeirinhas FC"], ["C.A. MALAAS", "SAF VK Phone"], ["Fatique FC", "Impondo Azul"], ["F.C.COM NOS NINGUEM PODE", "tricolormarcosfc"], ["Gandula Centroavante FC", "Saint Pablo SPFC"]],
 ];
-
 const DEFAULT_CONFIG = {
-  nomeLiga: "UEFA Champions Putos 2026",
-  numGrupos: 1,
-  numRodadas: 8,
-  margemEmpate: 3,
-  byeCount: 4,
-  playoffPairs: 4,
-  pin: "cartola2026",
+    nomeLiga: "UEFA Champions Putos 2026",
+    numGrupos: 1,
+    numRodadas: 8,
+    margemEmpate: 3,
+    byeCount: 4,
+    playoffPairs: 4,
+    pin: "cartola2026",
 };
-
 function defaultData() {
-  const teams = TEAMS_SEED.map((t) => ({ ...t, grupo: 1 }));
-  const byName = {};
-  teams.forEach((t) => (byName[t.nome] = t.id));
-  const fixtures = [];
-  FIXTURES_R1_A_R8.forEach((pairs, idx) => {
-    pairs.forEach(([nomeA, nomeB]) => {
-      if (byName[nomeA] && byName[nomeB]) {
-        fixtures.push({ id: uid(), grupo: 1, rodada: idx + 1, timeA: byName[nomeA], timeB: byName[nomeB] });
-      }
+    const teams = TEAMS_SEED.map((t) => ({ ...t, grupo: 1 }));
+    const byName = {};
+    teams.forEach((t) => (byName[t.nome] = t.id));
+    const fixtures = [];
+    FIXTURES_R1_A_R8.forEach((pairs, idx) => {
+        pairs.forEach(([nomeA, nomeB]) => {
+            if (byName[nomeA] && byName[nomeB]) {
+                fixtures.push({ id: uid(), grupo: 1, rodada: idx + 1, timeA: byName[nomeA], timeB: byName[nomeB] });
+            }
+        });
     });
-  });
-  return { config: { ...DEFAULT_CONFIG }, teams, fixtures, playoff: null };
+    return { config: { ...DEFAULT_CONFIG }, teams, fixtures, playoff: null };
 }
-
 async function fbGet(path) {
-  const res = await fetch(`${FIREBASE_URL}/${path}.json`);
-  if (!res.ok) throw new Error("Falha ao ler " + path + ": HTTP " + res.status);
-  return res.json();
+    const res = await fetch(`${FIREBASE_URL}/${path}.json`);
+    if (!res.ok)
+        throw new Error("Falha ao ler " + path + ": HTTP " + res.status);
+    return res.json();
 }
 async function fbPut(path, secret, value) {
-  const res = await fetch(`${FIREBASE_URL}/${path}.json?auth=${encodeURIComponent(secret)}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(value),
-  });
-  if (!res.ok) throw new Error("Falha ao gravar " + path + ": HTTP " + res.status);
-  return res.json();
+    const res = await fetch(`${FIREBASE_URL}/${path}.json?auth=${encodeURIComponent(secret)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(value),
+    });
+    if (!res.ok)
+        throw new Error("Falha ao gravar " + path + ": HTTP " + res.status);
+    return res.json();
 }
-
 function gerarRoundRobin(teamIds, numRodadas) {
-  let list = [...teamIds];
-  if (list.length % 2 === 1) list.push(null);
-  const n = list.length;
-  const rounds = [];
-  const arr = [...list];
-  for (let r = 0; r < Math.max(numRodadas, n - 1); r++) {
-    const pairs = [];
-    for (let i = 0; i < n / 2; i++) {
-      const a = arr[i], b = arr[n - 1 - i];
-      if (a !== null && b !== null) pairs.push([a, b]);
+    let list = [...teamIds];
+    if (list.length % 2 === 1)
+        list.push(null);
+    const n = list.length;
+    const rounds = [];
+    const arr = [...list];
+    for (let r = 0; r < Math.max(numRodadas, n - 1); r++) {
+        const pairs = [];
+        for (let i = 0; i < n / 2; i++) {
+            const a = arr[i], b = arr[n - 1 - i];
+            if (a !== null && b !== null)
+                pairs.push([a, b]);
+        }
+        rounds.push(pairs);
+        const fixed = arr[0];
+        const rest = arr.slice(1);
+        rest.unshift(rest.pop());
+        arr.splice(0, arr.length, fixed, ...rest);
     }
-    rounds.push(pairs);
-    const fixed = arr[0];
-    const rest = arr.slice(1);
-    rest.unshift(rest.pop());
-    arr.splice(0, arr.length, fixed, ...rest);
-  }
-  return rounds.slice(0, numRodadas);
+    return rounds.slice(0, numRodadas);
 }
-
 function resultadoConfronto(ptsA, ptsB, margem) {
-  if (ptsA == null || ptsB == null) return null;
-  const diff = Math.abs(ptsA - ptsB);
-  if (diff <= margem) return "empate";
-  return ptsA > ptsB ? "A" : "B";
+    if (ptsA == null || ptsB == null)
+        return null;
+    const diff = Math.abs(ptsA - ptsB);
+    if (diff <= margem)
+        return "empate";
+    return ptsA > ptsB ? "A" : "B";
 }
-
 function pontosDoTime(pontuacoes, rodada, teamId) {
-  const r = pontuacoes && pontuacoes[rodada];
-  if (!r) return null;
-  const v = r[teamId];
-  return v === undefined || v === null ? null : v;
+    const r = pontuacoes && pontuacoes[rodada];
+    if (!r)
+        return null;
+    const v = r[teamId];
+    return v === undefined || v === null ? null : v;
 }
-
 function calcularClassificacao(teams, fixtures, pontuacoes, config) {
-  const stats = {};
-  teams.forEach((t) => {
-    stats[t.id] = { id: t.id, nome: t.nome, grupo: t.grupo, j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, sg: 0, pts: 0 };
-  });
-  fixtures.forEach((f) => {
-    const ptsA = pontosDoTime(pontuacoes, f.rodada, f.timeA);
-    const ptsB = pontosDoTime(pontuacoes, f.rodada, f.timeB);
-    if (ptsA == null || ptsB == null) return;
-    const res = resultadoConfronto(ptsA, ptsB, config.margemEmpate);
-    const a = stats[f.timeA], b = stats[f.timeB];
-    if (!a || !b) return;
-    a.j++; b.j++;
-    a.gp += ptsA; a.gc += ptsB;
-    b.gp += ptsB; b.gc += ptsA;
-    if (res === "empate") { a.e++; b.e++; a.pts += 1; b.pts += 1; }
-    else if (res === "A") { a.v++; b.d++; a.pts += 3; }
-    else { b.v++; a.d++; b.pts += 3; }
-  });
-  Object.values(stats).forEach((s) => (s.sg = s.gp - s.gc));
-  const arr = Object.values(stats);
-  arr.sort((x, y) => y.pts - x.pts || y.v - x.v || y.sg - x.sg || y.gp - x.gp);
-  return arr;
+    const stats = {};
+    teams.forEach((t) => {
+        stats[t.id] = { id: t.id, nome: t.nome, grupo: t.grupo, j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, sg: 0, pts: 0 };
+    });
+    fixtures.forEach((f) => {
+        const ptsA = pontosDoTime(pontuacoes, f.rodada, f.timeA);
+        const ptsB = pontosDoTime(pontuacoes, f.rodada, f.timeB);
+        if (ptsA == null || ptsB == null)
+            return;
+        const res = resultadoConfronto(ptsA, ptsB, config.margemEmpate);
+        const a = stats[f.timeA], b = stats[f.timeB];
+        if (!a || !b)
+            return;
+        a.j++;
+        b.j++;
+        a.gp += ptsA;
+        a.gc += ptsB;
+        b.gp += ptsB;
+        b.gc += ptsA;
+        if (res === "empate") {
+            a.e++;
+            b.e++;
+            a.pts += 1;
+            b.pts += 1;
+        }
+        else if (res === "A") {
+            a.v++;
+            b.d++;
+            a.pts += 3;
+        }
+        else {
+            b.v++;
+            a.d++;
+            b.pts += 3;
+        }
+    });
+    Object.values(stats).forEach((s) => (s.sg = s.gp - s.gc));
+    const arr = Object.values(stats);
+    arr.sort((x, y) => y.pts - x.pts || y.v - x.v || y.sg - x.sg || y.gp - x.gp);
+    return arr;
 }
-
 function agruparPorGrupo(classGeral, numGrupos) {
-  const grupos = {};
-  for (let g = 1; g <= numGrupos; g++) grupos[g] = [];
-  classGeral.forEach((t) => { if (grupos[t.grupo]) grupos[t.grupo].push(t); });
-  return grupos;
+    const grupos = {};
+    for (let g = 1; g <= numGrupos; g++)
+        grupos[g] = [];
+    classGeral.forEach((t) => { if (grupos[t.grupo])
+        grupos[t.grupo].push(t); });
+    return grupos;
 }
-
 function gerarChaveMataMata(classGeral, config) {
-  const { byeCount, playoffPairs } = config;
-  const total = byeCount + playoffPairs * 2;
-  if (classGeral.length < total) return null;
-  const seeds = classGeral.slice(0, total);
-  const byes = seeds.slice(0, byeCount);
-  const playoffSeeds = seeds.slice(byeCount);
-  const playoffJogos = [];
-  for (let i = 0; i < playoffPairs; i++) {
-    const mandante = playoffSeeds[i];
-    const visitante = playoffSeeds[playoffSeeds.length - 1 - i];
-    playoffJogos.push({ id: uid(), nome: `Jogo ${String.fromCharCode(65 + i)} (${byeCount + i + 1}ºx${total - i}º)`, mandante: mandante.id, visitante: visitante.id, mandanteNome: mandante.nome, visitanteNome: visitante.nome, ptsIdaA: null, ptsVoltaA: null, ptsIdaB: null, ptsVoltaB: null });
-  }
-  const fases = [{ nome: "Playoffs", jogos: playoffJogos }];
-  const quartas = byes.map((bye, i) => ({
-    id: uid(), nome: `Q${i + 1} (${i + 1}ºxVenc${String.fromCharCode(65 + (playoffPairs - 1 - i))})`,
-    mandante: bye.id, mandanteNome: bye.nome,
-    visitante: null, visitanteNome: `Vencedor Jogo ${String.fromCharCode(65 + (playoffPairs - 1 - i))}`,
-    origemJogoId: playoffJogos[playoffPairs - 1 - i]?.id,
-    ptsIdaA: null, ptsVoltaA: null, ptsIdaB: null, ptsVoltaB: null,
-  }));
-  if (byeCount > 0) fases.push({ nome: "Quartas de Final", jogos: quartas });
-  return fases;
+    const { byeCount, playoffPairs } = config;
+    const total = byeCount + playoffPairs * 2;
+    if (classGeral.length < total)
+        return null;
+    const seeds = classGeral.slice(0, total);
+    const byes = seeds.slice(0, byeCount);
+    const playoffSeeds = seeds.slice(byeCount);
+    const playoffJogos = [];
+    for (let i = 0; i < playoffPairs; i++) {
+        const mandante = playoffSeeds[i];
+        const visitante = playoffSeeds[playoffSeeds.length - 1 - i];
+        playoffJogos.push({ id: uid(), nome: `Jogo ${String.fromCharCode(65 + i)} (${byeCount + i + 1}ºx${total - i}º)`, mandante: mandante.id, visitante: visitante.id, mandanteNome: mandante.nome, visitanteNome: visitante.nome, ptsIdaA: null, ptsVoltaA: null, ptsIdaB: null, ptsVoltaB: null });
+    }
+    const fases = [{ nome: "Playoffs", jogos: playoffJogos }];
+    const quartas = byes.map((bye, i) => {
+        var _a;
+        return ({
+            id: uid(), nome: `Q${i + 1} (${i + 1}ºxVenc${String.fromCharCode(65 + (playoffPairs - 1 - i))})`,
+            mandante: bye.id, mandanteNome: bye.nome,
+            visitante: null, visitanteNome: `Vencedor Jogo ${String.fromCharCode(65 + (playoffPairs - 1 - i))}`,
+            origemJogoId: (_a = playoffJogos[playoffPairs - 1 - i]) === null || _a === void 0 ? void 0 : _a.id,
+            ptsIdaA: null, ptsVoltaA: null, ptsIdaB: null, ptsVoltaB: null,
+        });
+    });
+    if (byeCount > 0)
+        fases.push({ nome: "Quartas de Final", jogos: quartas });
+    return fases;
 }
-
 function totalJogo(j) {
-  const totalA = (j.ptsIdaA || 0) + (j.ptsVoltaA || 0);
-  const totalB = (j.ptsIdaB || 0) + (j.ptsVoltaB || 0);
-  return { totalA, totalB };
+    const totalA = (j.ptsIdaA || 0) + (j.ptsVoltaA || 0);
+    const totalB = (j.ptsIdaB || 0) + (j.ptsVoltaB || 0);
+    return { totalA, totalB };
 }
 function vencedorJogo(j) {
-  const { totalA, totalB } = totalJogo(j);
-  if (j.ptsVoltaA == null || j.ptsVoltaB == null) return null;
-  if (totalA > totalB) return "mandante";
-  if (totalB > totalA) return "visitante";
-  return (j.ptsVoltaA || 0) > (j.ptsVoltaB || 0) ? "mandante" : "visitante";
+    const { totalA, totalB } = totalJogo(j);
+    if (j.ptsVoltaA == null || j.ptsVoltaB == null)
+        return null;
+    if (totalA > totalB)
+        return "mandante";
+    if (totalB > totalA)
+        return "visitante";
+    return (j.ptsVoltaA || 0) > (j.ptsVoltaB || 0) ? "mandante" : "visitante";
 }
-
 const TABS = [
-  { key: "classificacao", label: "Classificação", icon: "🏆" },
-  { key: "confrontos", label: "Confrontos", icon: "⚔️" },
-  { key: "matamata", label: "Mata-mata", icon: "🛡️" },
-  { key: "times", label: "Times", icon: "👥" },
-  { key: "admin", label: "Admin", icon: "⚙️" },
+    { key: "classificacao", label: "Classificação", icon: "🏆" },
+    { key: "confrontos", label: "Confrontos", icon: "⚔️" },
+    { key: "matamata", label: "Mata-mata", icon: "🛡️" },
+    { key: "times", label: "Times", icon: "👥" },
+    { key: "admin", label: "Admin", icon: "⚙️" },
 ];
-
 function App() {
-  const [data, setData] = useState(null);
-  const [pontuacoes, setPontuacoes] = useState({});
-  const [connStatus, setConnStatus] = useState("idle");
-  const [connMsg, setConnMsg] = useState("");
-  const [secret, setSecret] = useState(() => localStorage.getItem("ufp-secret") || null);
-  const [secretInput, setSecretInput] = useState("");
-
-  const [tab, setTab] = useState("classificacao");
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [pinInput, setPinInput] = useState("");
-  const [pinError, setPinError] = useState(false);
-  const [rodadaSel, setRodadaSel] = useState(1);
-  const [grupoSel, setGrupoSel] = useState(1);
-  const [toast, setToast] = useState("");
-
-  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2500); };
-
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      try {
-        const [liga, pts] = await Promise.all([fbGet("liga"), fbGet("pontuacoes")]);
-        if (cancelled) return;
-        setData(liga && liga.config ? liga : null);
-        setPontuacoes(pts || {});
-        setConnStatus("ok");
-        setConnMsg("");
-      } catch (e) {
-        if (cancelled) return;
-        setConnStatus("error");
-        setConnMsg(String(e.message || e));
-      }
-    };
-    load();
-    const interval = setInterval(load, 12000);
-    return () => { cancelled = true; clearInterval(interval); };
-  }, []);
-
-  const persist = useCallback(async (next) => {
-    setData(next);
-    if (!secret) { showToast("Configure o segredo de admin (aba Admin) pra salvar"); return; }
-    try { await fbPut("liga", secret, next); } catch (e) { showToast("Erro ao salvar no Firebase"); }
-  }, [secret]);
-
-  const setPontuacaoTime = useCallback(async (rodada, teamId, val) => {
-    const v = val === "" ? null : Number(val);
-    const rodadaAtual = { ...(pontuacoes[rodada] || {}), [teamId]: v };
-    const next = { ...pontuacoes, [rodada]: rodadaAtual };
-    setPontuacoes(next);
-    if (!secret) { showToast("Configure o segredo de admin (aba Admin) pra salvar"); return; }
-    try { await fbPut(`pontuacoes/${rodada}`, secret, rodadaAtual); } catch (e) { showToast("Erro ao salvar pontuação"); }
-  }, [secret, pontuacoes]);
-
-  const classGeral = useMemo(
-    () => (data ? calcularClassificacao(data.teams, data.fixtures, pontuacoes, data.config) : []),
-    [data, pontuacoes]
-  );
-  const grupos = useMemo(() => (data ? agruparPorGrupo(classGeral, data.config.numGrupos) : {}), [classGeral, data]);
-
-  const salvarSecret = () => {
-    if (!secretInput.trim()) return;
-    localStorage.setItem("ufp-secret", secretInput.trim());
-    setSecret(secretInput.trim());
-    setSecretInput("");
-    showToast("Segredo salvo neste navegador");
-  };
-
-  const inicializarLiga = () => persist(defaultData());
-
-  if (connStatus === "error") {
-    return (
-      <div className="min-h-screen bg-slate-950 text-slate-50 flex items-center justify-center px-4">
-        <div className="max-w-sm w-full text-center">
-          <div className="text-3xl mb-3">📴</div>
-          <p className="text-sm text-slate-400 mb-2">Não consegui conectar ao Firebase.</p>
-          <p className="text-xs font-mono text-slate-500 break-all">{connMsg}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!data) {
-    if (connStatus === "ok") {
-      return (
-        <div className="min-h-screen bg-slate-950 text-slate-50 flex items-center justify-center px-4">
-          <div className="max-w-sm w-full text-center">
-            <div className="text-3xl mb-3">🏆</div>
-            <p className="text-sm text-slate-400 mb-4">Conectado ao Firebase, mas ainda não tem dados de liga. Cole o segredo abaixo e inicialize.</p>
-            <input type="password" value={secretInput} onChange={(e) => setSecretInput(e.target.value)} placeholder="Segredo do Firebase" className="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-amber-500 mb-2" />
-            <button onClick={salvarSecret} className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs font-bold uppercase py-2 rounded-md mb-2">Salvar segredo</button>
-            {secret && <button onClick={inicializarLiga} className="w-full bg-amber-400 text-slate-950 font-bold uppercase tracking-wide text-xs py-2.5 rounded-md hover:bg-amber-300">Inicializar liga</button>}
-          </div>
-        </div>
-      );
-    }
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-amber-400 font-black tracking-widest uppercase text-sm animate-pulse">Carregando...</div>
-      </div>
-    );
-  }
-
-  const unlockAdmin = () => {
-    if (pinInput === data.config.pin) { setIsAdmin(true); setPinError(false); setPinInput(""); }
-    else setPinError(true);
-  };
-
-  const updateConfig = (patch) => persist({ ...data, config: { ...data.config, ...patch } });
-
-  const gerarFixturesGrupo = (g) => {
-    const teamIds = data.teams.filter((t) => t.grupo === g).map((t) => t.id);
-    if (teamIds.length < 2) { showToast("Grupo precisa de pelo menos 2 times"); return; }
-    const rounds = gerarRoundRobin(teamIds, data.config.numRodadas);
-    const novasFixtures = data.fixtures.filter((f) => f.grupo !== g);
-    rounds.forEach((pairs, idx) => {
-      pairs.forEach(([a, b]) => novasFixtures.push({ id: uid(), grupo: g, rodada: idx + 1, timeA: a, timeB: b }));
-    });
-    persist({ ...data, fixtures: novasFixtures });
-    showToast(`Confrontos do grupo ${g} gerados`);
-  };
-
-  const addTime = () => {
-    const nome = prompt("Nome do time:");
-    if (!nome) return;
-    persist({ ...data, teams: [...data.teams, { id: uid(), nome, grupo: 1 }] });
-  };
-  const removeTime = (id) => {
-    if (!confirm("Remover este time? Confrontos ligados a ele ficarão órfãos.")) return;
-    persist({ ...data, teams: data.teams.filter((t) => t.id !== id) });
-  };
-  const updateTime = (id, patch) => persist({ ...data, teams: data.teams.map((t) => (t.id === id ? { ...t, ...patch } : t)) });
-
-  const gerarMataMata = () => {
-    const fases = gerarChaveMataMata(classGeral, data.config);
-    if (!fases) { showToast("Times insuficientes para o mata-mata configurado"); return; }
-    persist({ ...data, playoff: { fases } });
-    showToast("Chave do mata-mata gerada");
-  };
-
-  const setPlayoffScore = (faseIdx, jogoId, campo, val) => {
-    const v = val === "" ? null : Number(val);
-    const fases = data.playoff.fases.map((fase, i) => {
-      if (i !== faseIdx) return fase;
-      return { ...fase, jogos: fase.jogos.map((j) => (j.id === jogoId ? { ...j, [campo]: v } : j)) };
-    });
-    persist({ ...data, playoff: { ...data.playoff, fases } });
-  };
-
-  const propagarVencedores = () => {
-    const fases = JSON.parse(JSON.stringify(data.playoff.fases));
-    for (let i = 1; i < fases.length; i++) {
-      fases[i].jogos.forEach((j) => {
-        if (j.origemJogoId) {
-          for (let k = 0; k < i; k++) {
-            const origem = fases[k].jogos.find((x) => x.id === j.origemJogoId);
-            if (origem) {
-              const venc = vencedorJogo(origem);
-              if (venc === "mandante") { j.visitante = origem.mandante; j.visitanteNome = origem.mandanteNome; }
-              else if (venc === "visitante") { j.visitante = origem.visitante; j.visitanteNome = origem.visitanteNome; }
+    const [data, setData] = useState(null);
+    const [pontuacoes, setPontuacoes] = useState({});
+    const [connStatus, setConnStatus] = useState("idle");
+    const [connMsg, setConnMsg] = useState("");
+    const [secret, setSecret] = useState(() => localStorage.getItem("ufp-secret") || null);
+    const [secretInput, setSecretInput] = useState("");
+    const [tab, setTab] = useState("classificacao");
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [pinInput, setPinInput] = useState("");
+    const [pinError, setPinError] = useState(false);
+    const [rodadaSel, setRodadaSel] = useState(1);
+    const [grupoSel, setGrupoSel] = useState(1);
+    const [toast, setToast] = useState("");
+    const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2500); };
+    useEffect(() => {
+        let cancelled = false;
+        const load = async () => {
+            try {
+                const [liga, pts] = await Promise.all([fbGet("liga"), fbGet("pontuacoes")]);
+                if (cancelled)
+                    return;
+                setData(liga && liga.config ? liga : null);
+                setPontuacoes(pts || {});
+                setConnStatus("ok");
+                setConnMsg("");
             }
-          }
+            catch (e) {
+                if (cancelled)
+                    return;
+                setConnStatus("error");
+                setConnMsg(String(e.message || e));
+            }
+        };
+        load();
+        const interval = setInterval(load, 12000);
+        return () => { cancelled = true; clearInterval(interval); };
+    }, []);
+    const persist = useCallback(async (next) => {
+        setData(next);
+        if (!secret) {
+            showToast("Configure o segredo de admin (aba Admin) pra salvar");
+            return;
         }
-      });
+        try {
+            await fbPut("liga", secret, next);
+        }
+        catch (e) {
+            showToast("Erro ao salvar no Firebase");
+        }
+    }, [secret]);
+    const setPontuacaoTime = useCallback(async (rodada, teamId, val) => {
+        const v = val === "" ? null : Number(val);
+        const rodadaAtual = { ...(pontuacoes[rodada] || {}), [teamId]: v };
+        const next = { ...pontuacoes, [rodada]: rodadaAtual };
+        setPontuacoes(next);
+        if (!secret) {
+            showToast("Configure o segredo de admin (aba Admin) pra salvar");
+            return;
+        }
+        try {
+            await fbPut(`pontuacoes/${rodada}`, secret, rodadaAtual);
+        }
+        catch (e) {
+            showToast("Erro ao salvar pontuação");
+        }
+    }, [secret, pontuacoes]);
+    const classGeral = useMemo(() => (data ? calcularClassificacao(data.teams, data.fixtures, pontuacoes, data.config) : []), [data, pontuacoes]);
+    const grupos = useMemo(() => (data ? agruparPorGrupo(classGeral, data.config.numGrupos) : {}), [classGeral, data]);
+    const salvarSecret = () => {
+        if (!secretInput.trim())
+            return;
+        localStorage.setItem("ufp-secret", secretInput.trim());
+        setSecret(secretInput.trim());
+        setSecretInput("");
+        showToast("Segredo salvo neste navegador");
+    };
+    const inicializarLiga = () => persist(defaultData());
+    if (connStatus === "error") {
+        return (React.createElement("div", { className: "min-h-screen bg-slate-950 text-slate-50 flex items-center justify-center px-4" },
+            React.createElement("div", { className: "max-w-sm w-full text-center" },
+                React.createElement("div", { className: "text-3xl mb-3" }, "\uD83D\uDCF4"),
+                React.createElement("p", { className: "text-sm text-slate-400 mb-2" }, "N\u00E3o consegui conectar ao Firebase."),
+                React.createElement("p", { className: "text-xs font-mono text-slate-500 break-all" }, connMsg))));
     }
-    persist({ ...data, playoff: { ...data.playoff, fases } });
-    showToast("Vencedores propagados para a próxima fase");
-  };
-
-  const rodadasDisponiveis = Array.from({ length: data.config.numRodadas }, (_, i) => i + 1);
-  const gruposDisponiveis = Array.from({ length: data.config.numGrupos }, (_, i) => i + 1);
-
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-50 font-sans">
-      <header className="border-b border-slate-700 bg-slate-900 sticky top-0 z-20">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-800 flex items-center justify-center shrink-0 shadow-lg text-lg">🏆</div>
-          <div className="min-w-0">
-            <h1 className="font-black uppercase tracking-wider text-sm sm:text-lg text-slate-50 truncate">{data.config.nomeLiga}</h1>
-            <p className="text-xs text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-              {data.teams.length} times · {data.config.numGrupos} grupo(s) · {data.config.numRodadas} rodadas
-              <span className="text-emerald-400">●</span>
-            </p>
-          </div>
-          <button onClick={() => isAdmin ? setIsAdmin(false) : setTab("admin")} className="ml-auto shrink-0 flex items-center gap-1.5 text-xs uppercase font-bold tracking-wide px-2.5 py-1.5 rounded-md border border-slate-700 text-slate-400 hover:text-amber-400 hover:border-amber-700 transition-colors">
-            {isAdmin ? "🔓" : "🔒"} {isAdmin ? "Admin" : "Entrar"}
-          </button>
-        </div>
-        <nav className="max-w-5xl mx-auto px-2 flex overflow-x-auto">
-          {TABS.map((t) => {
-            const active = tab === t.key;
-            return (
-              <button key={t.key} onClick={() => setTab(t.key)} className={`relative flex items-center gap-1.5 px-3 sm:px-4 py-3 text-xs font-bold uppercase tracking-wide whitespace-nowrap transition-colors ${active ? "text-amber-400" : "text-slate-400 hover:text-slate-50"}`}>
-                <span>{t.icon}</span>{t.label}
-                {active && <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-amber-400"></span>}
-              </button>
-            );
-          })}
-        </nav>
-      </header>
-
-      <main className="max-w-5xl mx-auto px-4 py-6 pb-24">
-        {tab === "classificacao" && (
-          <div className="space-y-8">
-            {gruposDisponiveis.map((g) => (
-              <div key={g}>
-                {data.config.numGrupos > 1 && <h2 className="text-xs font-black uppercase tracking-widest text-amber-400 mb-2">Grupo {g}</h2>}
-                <ClassTable rows={grupos[g] || []} />
-              </div>
-            ))}
-            {classGeral.every((t) => t.j === 0) && <EmptyState text="Nenhuma pontuação lançada ainda para nenhuma rodada." />}
-          </div>
-        )}
-
-        {tab === "confrontos" && (
-          <div>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {data.config.numGrupos > 1 && (
-                <select value={grupoSel} onChange={(e) => setGrupoSel(Number(e.target.value))} className="bg-slate-800 border border-slate-700 rounded-md px-2 py-1.5 text-xs font-bold uppercase tracking-wide">
-                  {gruposDisponiveis.map((g) => <option key={g} value={g}>Grupo {g}</option>)}
-                </select>
-              )}
-              <select value={rodadaSel} onChange={(e) => setRodadaSel(Number(e.target.value))} className="bg-slate-800 border border-slate-700 rounded-md px-2 py-1.5 text-xs font-bold uppercase tracking-wide">
-                {rodadasDisponiveis.map((r) => <option key={r} value={r}>Rodada {r}</option>)}
-              </select>
-              {isAdmin && (
-                <button onClick={() => gerarFixturesGrupo(grupoSel)} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-md bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900">
-                  🔄 Gerar confrontos do grupo
-                </button>
-              )}
-            </div>
-            {isAdmin && <p className="text-xs text-slate-400 mb-3">A pontuação puxada automaticamente (Apps Script → Firebase) aparece sozinha aqui.</p>}
-            <FixturesList
-              fixtures={data.fixtures.filter((f) => f.grupo === grupoSel && f.rodada === rodadaSel)}
-              teams={data.teams}
-              pontuacoes={pontuacoes}
-              config={data.config}
-              isAdmin={isAdmin}
-              onScoreTeam={setPontuacaoTime}
-            />
-          </div>
-        )}
-
-        {tab === "matamata" && (
-          <div>
-            {isAdmin && (
-              <div className="flex flex-wrap gap-2 mb-5">
-                <button onClick={gerarMataMata} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-md bg-amber-950 text-amber-400 border border-amber-800 hover:bg-amber-900">
-                  🛡️ Gerar chave (da classificação atual)
-                </button>
-                {data.playoff && (
-                  <button onClick={propagarVencedores} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-md border border-slate-700 text-slate-400 hover:text-slate-50">
-                    ▶ Propagar vencedores
-                  </button>
-                )}
-              </div>
-            )}
-            {!data.playoff && <EmptyState text="Chave do mata-mata ainda não foi gerada." />}
-            {data.playoff && data.playoff.fases.map((fase, fi) => (
-              <div key={fase.nome} className="mb-8">
-                <h2 className="text-xs font-black uppercase tracking-widest text-amber-400 mb-2">{fase.nome}</h2>
-                <div className="space-y-2">
-                  {fase.jogos.map((j) => (
-                    <PlayoffCard key={j.id} jogo={j} isAdmin={isAdmin} onScore={(campo, val) => setPlayoffScore(fi, j.id, campo, val)} />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {tab === "times" && (
-          <div>
-            {isAdmin && (
-              <button onClick={addTime} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-md bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900 mb-4">
-                ➕ Adicionar time
-              </button>
-            )}
-            <div className="grid sm:grid-cols-2 gap-2">
-              {data.teams.map((t) => (
-                <div key={t.id} className="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5">
-                  {isAdmin ? (
-                    <input value={t.nome} onChange={(e) => updateTime(t.id, { nome: e.target.value })} className="bg-transparent text-sm font-semibold flex-1 outline-none focus:ring-1 focus:ring-amber-500 rounded px-1" />
-                  ) : (
-                    <span className="text-sm font-semibold flex-1 truncate">{t.nome}</span>
-                  )}
-                  {isAdmin && data.config.numGrupos > 1 && (
-                    <select value={t.grupo} onChange={(e) => updateTime(t.id, { grupo: Number(e.target.value) })} className="bg-slate-900 border border-slate-700 rounded px-1.5 py-1 text-xs">
-                      {gruposDisponiveis.map((g) => <option key={g} value={g}>G{g}</option>)}
-                    </select>
-                  )}
-                  {isAdmin && <button onClick={() => removeTime(t.id)} className="text-red-400 hover:text-red-300 shrink-0">🗑️</button>}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {tab === "admin" && (
-          <AdminPanel
-            isAdmin={isAdmin} pinInput={pinInput} setPinInput={setPinInput} pinError={pinError} unlockAdmin={unlockAdmin}
-            config={data.config} updateConfig={updateConfig}
-            secret={secret} secretInput={secretInput} setSecretInput={setSecretInput} salvarSecret={salvarSecret}
-          />
-        )}
-      </main>
-
-      {toast && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-800 border border-amber-700 text-slate-50 text-xs font-semibold px-4 py-2.5 rounded-lg shadow-xl z-30">{toast}</div>
-      )}
-    </div>
-  );
+    if (!data) {
+        if (connStatus === "ok") {
+            return (React.createElement("div", { className: "min-h-screen bg-slate-950 text-slate-50 flex items-center justify-center px-4" },
+                React.createElement("div", { className: "max-w-sm w-full text-center" },
+                    React.createElement("div", { className: "text-3xl mb-3" }, "\uD83C\uDFC6"),
+                    React.createElement("p", { className: "text-sm text-slate-400 mb-4" }, "Conectado ao Firebase, mas ainda n\u00E3o tem dados de liga. Cole o segredo abaixo e inicialize."),
+                    React.createElement("input", { type: "password", value: secretInput, onChange: (e) => setSecretInput(e.target.value), placeholder: "Segredo do Firebase", className: "w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-amber-500 mb-2" }),
+                    React.createElement("button", { onClick: salvarSecret, className: "w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs font-bold uppercase py-2 rounded-md mb-2" }, "Salvar segredo"),
+                    secret && React.createElement("button", { onClick: inicializarLiga, className: "w-full bg-amber-400 text-slate-950 font-bold uppercase tracking-wide text-xs py-2.5 rounded-md hover:bg-amber-300" }, "Inicializar liga"))));
+        }
+        return (React.createElement("div", { className: "min-h-screen bg-slate-950 flex items-center justify-center" },
+            React.createElement("div", { className: "text-amber-400 font-black tracking-widest uppercase text-sm animate-pulse" }, "Carregando...")));
+    }
+    const unlockAdmin = () => {
+        if (pinInput === data.config.pin) {
+            setIsAdmin(true);
+            setPinError(false);
+            setPinInput("");
+        }
+        else
+            setPinError(true);
+    };
+    const updateConfig = (patch) => persist({ ...data, config: { ...data.config, ...patch } });
+    const gerarFixturesGrupo = (g) => {
+        const teamIds = data.teams.filter((t) => t.grupo === g).map((t) => t.id);
+        if (teamIds.length < 2) {
+            showToast("Grupo precisa de pelo menos 2 times");
+            return;
+        }
+        const rounds = gerarRoundRobin(teamIds, data.config.numRodadas);
+        const novasFixtures = data.fixtures.filter((f) => f.grupo !== g);
+        rounds.forEach((pairs, idx) => {
+            pairs.forEach(([a, b]) => novasFixtures.push({ id: uid(), grupo: g, rodada: idx + 1, timeA: a, timeB: b }));
+        });
+        persist({ ...data, fixtures: novasFixtures });
+        showToast(`Confrontos do grupo ${g} gerados`);
+    };
+    const addTime = () => {
+        const nome = prompt("Nome do time:");
+        if (!nome)
+            return;
+        persist({ ...data, teams: [...data.teams, { id: uid(), nome, grupo: 1 }] });
+    };
+    const removeTime = (id) => {
+        if (!confirm("Remover este time? Confrontos ligados a ele ficarão órfãos."))
+            return;
+        persist({ ...data, teams: data.teams.filter((t) => t.id !== id) });
+    };
+    const updateTime = (id, patch) => persist({ ...data, teams: data.teams.map((t) => (t.id === id ? { ...t, ...patch } : t)) });
+    const gerarMataMata = () => {
+        const fases = gerarChaveMataMata(classGeral, data.config);
+        if (!fases) {
+            showToast("Times insuficientes para o mata-mata configurado");
+            return;
+        }
+        persist({ ...data, playoff: { fases } });
+        showToast("Chave do mata-mata gerada");
+    };
+    const setPlayoffScore = (faseIdx, jogoId, campo, val) => {
+        const v = val === "" ? null : Number(val);
+        const fases = data.playoff.fases.map((fase, i) => {
+            if (i !== faseIdx)
+                return fase;
+            return { ...fase, jogos: fase.jogos.map((j) => (j.id === jogoId ? { ...j, [campo]: v } : j)) };
+        });
+        persist({ ...data, playoff: { ...data.playoff, fases } });
+    };
+    const propagarVencedores = () => {
+        const fases = JSON.parse(JSON.stringify(data.playoff.fases));
+        for (let i = 1; i < fases.length; i++) {
+            fases[i].jogos.forEach((j) => {
+                if (j.origemJogoId) {
+                    for (let k = 0; k < i; k++) {
+                        const origem = fases[k].jogos.find((x) => x.id === j.origemJogoId);
+                        if (origem) {
+                            const venc = vencedorJogo(origem);
+                            if (venc === "mandante") {
+                                j.visitante = origem.mandante;
+                                j.visitanteNome = origem.mandanteNome;
+                            }
+                            else if (venc === "visitante") {
+                                j.visitante = origem.visitante;
+                                j.visitanteNome = origem.visitanteNome;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        persist({ ...data, playoff: { ...data.playoff, fases } });
+        showToast("Vencedores propagados para a próxima fase");
+    };
+    const rodadasDisponiveis = Array.from({ length: data.config.numRodadas }, (_, i) => i + 1);
+    const gruposDisponiveis = Array.from({ length: data.config.numGrupos }, (_, i) => i + 1);
+    return (React.createElement("div", { className: "min-h-screen bg-slate-950 text-slate-50 font-sans" },
+        React.createElement("header", { className: "border-b border-slate-700 bg-slate-900 sticky top-0 z-20" },
+            React.createElement("div", { className: "max-w-5xl mx-auto px-4 py-4 flex items-center gap-3" },
+                React.createElement("div", { className: "w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-800 flex items-center justify-center shrink-0 shadow-lg text-lg" }, "\uD83C\uDFC6"),
+                React.createElement("div", { className: "min-w-0" },
+                    React.createElement("h1", { className: "font-black uppercase tracking-wider text-sm sm:text-lg text-slate-50 truncate" }, data.config.nomeLiga),
+                    React.createElement("p", { className: "text-xs text-slate-400 uppercase tracking-widest flex items-center gap-1.5" },
+                        data.teams.length,
+                        " times \u00B7 ",
+                        data.config.numGrupos,
+                        " grupo(s) \u00B7 ",
+                        data.config.numRodadas,
+                        " rodadas",
+                        React.createElement("span", { className: "text-emerald-400" }, "\u25CF"))),
+                React.createElement("button", { onClick: () => isAdmin ? setIsAdmin(false) : setTab("admin"), className: "ml-auto shrink-0 flex items-center gap-1.5 text-xs uppercase font-bold tracking-wide px-2.5 py-1.5 rounded-md border border-slate-700 text-slate-400 hover:text-amber-400 hover:border-amber-700 transition-colors" },
+                    isAdmin ? "🔓" : "🔒",
+                    " ",
+                    isAdmin ? "Admin" : "Entrar")),
+            React.createElement("nav", { className: "max-w-5xl mx-auto px-2 flex overflow-x-auto" }, TABS.map((t) => {
+                const active = tab === t.key;
+                return (React.createElement("button", { key: t.key, onClick: () => setTab(t.key), className: `relative flex items-center gap-1.5 px-3 sm:px-4 py-3 text-xs font-bold uppercase tracking-wide whitespace-nowrap transition-colors ${active ? "text-amber-400" : "text-slate-400 hover:text-slate-50"}` },
+                    React.createElement("span", null, t.icon),
+                    t.label,
+                    active && React.createElement("span", { className: "absolute bottom-0 left-2 right-2 h-0.5 bg-amber-400" })));
+            }))),
+        React.createElement("main", { className: "max-w-5xl mx-auto px-4 py-6 pb-24" },
+            tab === "classificacao" && (React.createElement("div", { className: "space-y-8" },
+                gruposDisponiveis.map((g) => (React.createElement("div", { key: g },
+                    data.config.numGrupos > 1 && React.createElement("h2", { className: "text-xs font-black uppercase tracking-widest text-amber-400 mb-2" },
+                        "Grupo ",
+                        g),
+                    React.createElement(ClassTable, { rows: grupos[g] || [] })))),
+                classGeral.every((t) => t.j === 0) && React.createElement(EmptyState, { text: "Nenhuma pontua\u00E7\u00E3o lan\u00E7ada ainda para nenhuma rodada." }))),
+            tab === "confrontos" && (React.createElement("div", null,
+                React.createElement("div", { className: "flex flex-wrap gap-2 mb-4" },
+                    data.config.numGrupos > 1 && (React.createElement("select", { value: grupoSel, onChange: (e) => setGrupoSel(Number(e.target.value)), className: "bg-slate-800 border border-slate-700 rounded-md px-2 py-1.5 text-xs font-bold uppercase tracking-wide" }, gruposDisponiveis.map((g) => React.createElement("option", { key: g, value: g },
+                        "Grupo ",
+                        g)))),
+                    React.createElement("select", { value: rodadaSel, onChange: (e) => setRodadaSel(Number(e.target.value)), className: "bg-slate-800 border border-slate-700 rounded-md px-2 py-1.5 text-xs font-bold uppercase tracking-wide" }, rodadasDisponiveis.map((r) => React.createElement("option", { key: r, value: r },
+                        "Rodada ",
+                        r))),
+                    isAdmin && (React.createElement("button", { onClick: () => gerarFixturesGrupo(grupoSel), className: "flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-md bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900" }, "\uD83D\uDD04 Gerar confrontos do grupo"))),
+                isAdmin && React.createElement("p", { className: "text-xs text-slate-400 mb-3" }, "A pontua\u00E7\u00E3o puxada automaticamente (Apps Script \u2192 Firebase) aparece sozinha aqui."),
+                React.createElement(FixturesList, { fixtures: data.fixtures.filter((f) => f.grupo === grupoSel && f.rodada === rodadaSel), teams: data.teams, pontuacoes: pontuacoes, config: data.config, isAdmin: isAdmin, onScoreTeam: setPontuacaoTime }))),
+            tab === "matamata" && (React.createElement("div", null,
+                isAdmin && (React.createElement("div", { className: "flex flex-wrap gap-2 mb-5" },
+                    React.createElement("button", { onClick: gerarMataMata, className: "flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-md bg-amber-950 text-amber-400 border border-amber-800 hover:bg-amber-900" }, "\uD83D\uDEE1\uFE0F Gerar chave (da classifica\u00E7\u00E3o atual)"),
+                    data.playoff && (React.createElement("button", { onClick: propagarVencedores, className: "flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-md border border-slate-700 text-slate-400 hover:text-slate-50" }, "\u25B6 Propagar vencedores")))),
+                !data.playoff && React.createElement(EmptyState, { text: "Chave do mata-mata ainda n\u00E3o foi gerada." }),
+                data.playoff && data.playoff.fases.map((fase, fi) => (React.createElement("div", { key: fase.nome, className: "mb-8" },
+                    React.createElement("h2", { className: "text-xs font-black uppercase tracking-widest text-amber-400 mb-2" }, fase.nome),
+                    React.createElement("div", { className: "space-y-2" }, fase.jogos.map((j) => (React.createElement(PlayoffCard, { key: j.id, jogo: j, isAdmin: isAdmin, onScore: (campo, val) => setPlayoffScore(fi, j.id, campo, val) }))))))))),
+            tab === "times" && (React.createElement("div", null,
+                isAdmin && (React.createElement("button", { onClick: addTime, className: "flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-md bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900 mb-4" }, "\u2795 Adicionar time")),
+                React.createElement("div", { className: "grid sm:grid-cols-2 gap-2" }, data.teams.map((t) => (React.createElement("div", { key: t.id, className: "flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5" },
+                    isAdmin ? (React.createElement("input", { value: t.nome, onChange: (e) => updateTime(t.id, { nome: e.target.value }), className: "bg-transparent text-sm font-semibold flex-1 outline-none focus:ring-1 focus:ring-amber-500 rounded px-1" })) : (React.createElement("span", { className: "text-sm font-semibold flex-1 truncate" }, t.nome)),
+                    isAdmin && data.config.numGrupos > 1 && (React.createElement("select", { value: t.grupo, onChange: (e) => updateTime(t.id, { grupo: Number(e.target.value) }), className: "bg-slate-900 border border-slate-700 rounded px-1.5 py-1 text-xs" }, gruposDisponiveis.map((g) => React.createElement("option", { key: g, value: g },
+                        "G",
+                        g)))),
+                    isAdmin && React.createElement("button", { onClick: () => removeTime(t.id), className: "text-red-400 hover:text-red-300 shrink-0" }, "\uD83D\uDDD1\uFE0F"))))))),
+            tab === "admin" && (React.createElement(AdminPanel, { isAdmin: isAdmin, pinInput: pinInput, setPinInput: setPinInput, pinError: pinError, unlockAdmin: unlockAdmin, config: data.config, updateConfig: updateConfig, secret: secret, secretInput: secretInput, setSecretInput: setSecretInput, salvarSecret: salvarSecret }))),
+        toast && (React.createElement("div", { className: "fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-800 border border-amber-700 text-slate-50 text-xs font-semibold px-4 py-2.5 rounded-lg shadow-xl z-30" }, toast))));
 }
-
 function EmptyState({ text }) {
-  return <div className="border border-dashed border-slate-700 rounded-lg py-10 px-4 text-center"><p className="text-sm text-slate-400">{text}</p></div>;
+    return React.createElement("div", { className: "border border-dashed border-slate-700 rounded-lg py-10 px-4 text-center" },
+        React.createElement("p", { className: "text-sm text-slate-400" }, text));
 }
-
 function ClassTable({ rows }) {
-  if (!rows.length) return <EmptyState text="Sem times neste grupo." />;
-  return (
-    <div className="overflow-x-auto rounded-lg border border-slate-700">
-      <table className="w-full text-xs sm:text-sm">
-        <thead>
-          <tr className="bg-slate-800 text-slate-400 uppercase text-xs tracking-wider">
-            <th className="px-2 py-2 text-left w-8">#</th>
-            <th className="px-2 py-2 text-left">Time</th>
-            <th className="px-2 py-2 text-center">J</th>
-            <th className="px-2 py-2 text-center">V</th>
-            <th className="px-2 py-2 text-center">E</th>
-            <th className="px-2 py-2 text-center">D</th>
-            <th className="px-2 py-2 text-center">SG</th>
-            <th className="px-2 py-2 text-center font-black">PTS</th>
-          </tr>
-        </thead>
-        <tbody className="font-mono tabular-nums">
-          {rows.map((t, i) => (
-            <tr key={t.id} className={`border-t border-slate-700 ${i % 2 === 0 ? "bg-slate-900" : "bg-slate-950"} ${i < 4 ? "border-l-2 border-l-amber-400" : ""}`}>
-              <td className="px-2 py-2 text-slate-400 font-sans">{i + 1}</td>
-              <td className="px-2 py-2 font-sans font-semibold truncate max-w-36 sm:max-w-none">{t.nome}</td>
-              <td className="px-2 py-2 text-center">{t.j}</td>
-              <td className="px-2 py-2 text-center text-emerald-400">{t.v}</td>
-              <td className="px-2 py-2 text-center text-slate-400">{t.e}</td>
-              <td className="px-2 py-2 text-center text-red-400">{t.d}</td>
-              <td className="px-2 py-2 text-center">{t.sg > 0 ? `+${t.sg}` : t.sg}</td>
-              <td className="px-2 py-2 text-center font-black text-amber-400">{t.pts}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+    if (!rows.length)
+        return React.createElement(EmptyState, { text: "Sem times neste grupo." });
+    return (React.createElement("div", { className: "overflow-x-auto rounded-lg border border-slate-700" },
+        React.createElement("table", { className: "w-full text-xs sm:text-sm" },
+            React.createElement("thead", null,
+                React.createElement("tr", { className: "bg-slate-800 text-slate-400 uppercase text-xs tracking-wider" },
+                    React.createElement("th", { className: "px-2 py-2 text-left w-8" }, "#"),
+                    React.createElement("th", { className: "px-2 py-2 text-left" }, "Time"),
+                    React.createElement("th", { className: "px-2 py-2 text-center" }, "J"),
+                    React.createElement("th", { className: "px-2 py-2 text-center" }, "V"),
+                    React.createElement("th", { className: "px-2 py-2 text-center" }, "E"),
+                    React.createElement("th", { className: "px-2 py-2 text-center" }, "D"),
+                    React.createElement("th", { className: "px-2 py-2 text-center" }, "SG"),
+                    React.createElement("th", { className: "px-2 py-2 text-center font-black" }, "PTS"))),
+            React.createElement("tbody", { className: "font-mono tabular-nums" }, rows.map((t, i) => (React.createElement("tr", { key: t.id, className: `border-t border-slate-700 ${i % 2 === 0 ? "bg-slate-900" : "bg-slate-950"} ${i < 4 ? "border-l-2 border-l-amber-400" : ""}` },
+                React.createElement("td", { className: "px-2 py-2 text-slate-400 font-sans" }, i + 1),
+                React.createElement("td", { className: "px-2 py-2 font-sans font-semibold truncate max-w-36 sm:max-w-none" }, t.nome),
+                React.createElement("td", { className: "px-2 py-2 text-center" }, t.j),
+                React.createElement("td", { className: "px-2 py-2 text-center text-emerald-400" }, t.v),
+                React.createElement("td", { className: "px-2 py-2 text-center text-slate-400" }, t.e),
+                React.createElement("td", { className: "px-2 py-2 text-center text-red-400" }, t.d),
+                React.createElement("td", { className: "px-2 py-2 text-center" }, t.sg > 0 ? `+${t.sg}` : t.sg),
+                React.createElement("td", { className: "px-2 py-2 text-center font-black text-amber-400" }, t.pts))))))));
 }
-
 function FixturesList({ fixtures, teams, pontuacoes, config, isAdmin, onScoreTeam }) {
-  const nome = (id) => teams.find((t) => t.id === id)?.nome || "?";
-  if (!fixtures.length) return <EmptyState text="Nenhum confronto nesta rodada/grupo. Gere os confrontos no modo admin." />;
-  return (
-    <div className="space-y-2">
-      {fixtures.map((f) => {
+    const nome = (id) => { var _a; return ((_a = teams.find((t) => t.id === id)) === null || _a === void 0 ? void 0 : _a.nome) || "?"; };
+    if (!fixtures.length)
+        return React.createElement(EmptyState, { text: "Nenhum confronto nesta rodada/grupo. Gere os confrontos no modo admin." });
+    return (React.createElement("div", { className: "space-y-2" }, fixtures.map((f) => {
         const ptsA = pontosDoTime(pontuacoes, f.rodada, f.timeA);
         const ptsB = pontosDoTime(pontuacoes, f.rodada, f.timeB);
         const res = resultadoConfronto(ptsA, ptsB, config.margemEmpate);
-        return (
-          <div key={f.id} className="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-3">
-            <span className={`flex-1 text-sm font-semibold truncate text-right ${res === "A" ? "text-amber-400" : ""}`}>{nome(f.timeA)}</span>
-            {isAdmin ? (
-              <input type="number" step="0.01" value={ptsA ?? ""} onChange={(e) => onScoreTeam(f.rodada, f.timeA, e.target.value)} className="w-16 bg-slate-900 border border-slate-700 rounded text-center py-1 font-mono text-sm outline-none focus:ring-1 focus:ring-amber-500" placeholder="—" />
-            ) : (
-              <span className="w-16 text-center font-mono font-bold text-sm">{ptsA ?? "—"}</span>
-            )}
-            <span className="text-slate-400 text-xs shrink-0">{res === "empate" ? "≈" : "x"}</span>
-            {isAdmin ? (
-              <input type="number" step="0.01" value={ptsB ?? ""} onChange={(e) => onScoreTeam(f.rodada, f.timeB, e.target.value)} className="w-16 bg-slate-900 border border-slate-700 rounded text-center py-1 font-mono text-sm outline-none focus:ring-1 focus:ring-amber-500" placeholder="—" />
-            ) : (
-              <span className="w-16 text-center font-mono font-bold text-sm">{ptsB ?? "—"}</span>
-            )}
-            <span className={`flex-1 text-sm font-semibold truncate ${res === "B" ? "text-amber-400" : ""}`}>{nome(f.timeB)}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
+        return (React.createElement("div", { key: f.id, className: "flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-3" },
+            React.createElement("span", { className: `flex-1 text-sm font-semibold truncate text-right ${res === "A" ? "text-amber-400" : ""}` }, nome(f.timeA)),
+            isAdmin ? (React.createElement("input", { type: "number", step: "0.01", value: ptsA !== null && ptsA !== void 0 ? ptsA : "", onChange: (e) => onScoreTeam(f.rodada, f.timeA, e.target.value), className: "w-16 bg-slate-900 border border-slate-700 rounded text-center py-1 font-mono text-sm outline-none focus:ring-1 focus:ring-amber-500", placeholder: "\u2014" })) : (React.createElement("span", { className: "w-16 text-center font-mono font-bold text-sm" }, ptsA !== null && ptsA !== void 0 ? ptsA : "—")),
+            React.createElement("span", { className: "text-slate-400 text-xs shrink-0" }, res === "empate" ? "≈" : "x"),
+            isAdmin ? (React.createElement("input", { type: "number", step: "0.01", value: ptsB !== null && ptsB !== void 0 ? ptsB : "", onChange: (e) => onScoreTeam(f.rodada, f.timeB, e.target.value), className: "w-16 bg-slate-900 border border-slate-700 rounded text-center py-1 font-mono text-sm outline-none focus:ring-1 focus:ring-amber-500", placeholder: "\u2014" })) : (React.createElement("span", { className: "w-16 text-center font-mono font-bold text-sm" }, ptsB !== null && ptsB !== void 0 ? ptsB : "—")),
+            React.createElement("span", { className: `flex-1 text-sm font-semibold truncate ${res === "B" ? "text-amber-400" : ""}` }, nome(f.timeB))));
+    })));
 }
-
 function PlayoffCard({ jogo, isAdmin, onScore }) {
-  const { totalA, totalB } = totalJogo(jogo);
-  const venc = vencedorJogo(jogo);
-  return (
-    <div className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-3">
-      <div className="text-xs uppercase tracking-wider text-slate-400 mb-2">{jogo.nome}</div>
-      <div className="flex items-center gap-2 text-sm">
-        <span className={`flex-1 font-semibold truncate text-right ${venc === "mandante" ? "text-amber-400" : ""}`}>{jogo.mandanteNome}</span>
-        <ScoreInput value={jogo.ptsIdaA} onChange={(v) => onScore("ptsIdaA", v)} isAdmin={isAdmin} />
-        <ScoreInput value={jogo.ptsVoltaA} onChange={(v) => onScore("ptsVoltaA", v)} isAdmin={isAdmin} />
-        <span className="text-xs text-slate-400 w-4 text-center">x</span>
-        <span className="flex-1"></span>
-      </div>
-      <div className="flex items-center gap-2 text-sm mt-1">
-        <span className="flex-1"></span>
-        <ScoreInput value={jogo.ptsIdaB} onChange={(v) => onScore("ptsIdaB", v)} isAdmin={isAdmin} />
-        <ScoreInput value={jogo.ptsVoltaB} onChange={(v) => onScore("ptsVoltaB", v)} isAdmin={isAdmin} />
-        <span className="w-4"></span>
-        <span className={`flex-1 font-semibold truncate ${venc === "visitante" ? "text-amber-400" : ""}`}>{jogo.visitanteNome}</span>
-      </div>
-      <div className="mt-2 text-center text-xs font-mono text-slate-400">
-        Total: <span className="font-bold text-slate-50">{totalA}</span> x <span className="font-bold text-slate-50">{totalB}</span>
-        {venc && <span className="ml-2 text-emerald-400 font-bold uppercase">Avança: {venc === "mandante" ? jogo.mandanteNome : jogo.visitanteNome}</span>}
-      </div>
-    </div>
-  );
+    const { totalA, totalB } = totalJogo(jogo);
+    const venc = vencedorJogo(jogo);
+    return (React.createElement("div", { className: "bg-slate-800 border border-slate-700 rounded-lg px-3 py-3" },
+        React.createElement("div", { className: "text-xs uppercase tracking-wider text-slate-400 mb-2" }, jogo.nome),
+        React.createElement("div", { className: "flex items-center gap-2 text-sm" },
+            React.createElement("span", { className: `flex-1 font-semibold truncate text-right ${venc === "mandante" ? "text-amber-400" : ""}` }, jogo.mandanteNome),
+            React.createElement(ScoreInput, { value: jogo.ptsIdaA, onChange: (v) => onScore("ptsIdaA", v), isAdmin: isAdmin }),
+            React.createElement(ScoreInput, { value: jogo.ptsVoltaA, onChange: (v) => onScore("ptsVoltaA", v), isAdmin: isAdmin }),
+            React.createElement("span", { className: "text-xs text-slate-400 w-4 text-center" }, "x"),
+            React.createElement("span", { className: "flex-1" })),
+        React.createElement("div", { className: "flex items-center gap-2 text-sm mt-1" },
+            React.createElement("span", { className: "flex-1" }),
+            React.createElement(ScoreInput, { value: jogo.ptsIdaB, onChange: (v) => onScore("ptsIdaB", v), isAdmin: isAdmin }),
+            React.createElement(ScoreInput, { value: jogo.ptsVoltaB, onChange: (v) => onScore("ptsVoltaB", v), isAdmin: isAdmin }),
+            React.createElement("span", { className: "w-4" }),
+            React.createElement("span", { className: `flex-1 font-semibold truncate ${venc === "visitante" ? "text-amber-400" : ""}` }, jogo.visitanteNome)),
+        React.createElement("div", { className: "mt-2 text-center text-xs font-mono text-slate-400" },
+            "Total: ",
+            React.createElement("span", { className: "font-bold text-slate-50" }, totalA),
+            " x ",
+            React.createElement("span", { className: "font-bold text-slate-50" }, totalB),
+            venc && React.createElement("span", { className: "ml-2 text-emerald-400 font-bold uppercase" },
+                "Avan\u00E7a: ",
+                venc === "mandante" ? jogo.mandanteNome : jogo.visitanteNome))));
 }
-
 function ScoreInput({ value, onChange, isAdmin }) {
-  if (!isAdmin) return <span className="w-12 text-center font-mono text-xs">{value ?? "—"}</span>;
-  return <input type="number" step="0.01" value={value ?? ""} onChange={(e) => onChange(e.target.value === "" ? "" : e.target.value)} className="w-12 bg-slate-900 border border-slate-700 rounded text-center py-1 font-mono text-xs outline-none focus:ring-1 focus:ring-amber-500" placeholder="—" />;
+    if (!isAdmin)
+        return React.createElement("span", { className: "w-12 text-center font-mono text-xs" }, value !== null && value !== void 0 ? value : "—");
+    return React.createElement("input", { type: "number", step: "0.01", value: value !== null && value !== void 0 ? value : "", onChange: (e) => onChange(e.target.value === "" ? "" : e.target.value), className: "w-12 bg-slate-900 border border-slate-700 rounded text-center py-1 font-mono text-xs outline-none focus:ring-1 focus:ring-amber-500", placeholder: "\u2014" });
 }
-
 function AdminPanel({ isAdmin, pinInput, setPinInput, pinError, unlockAdmin, config, updateConfig, secret, secretInput, setSecretInput, salvarSecret }) {
-  if (!isAdmin) {
-    return (
-      <div className="max-w-xs mx-auto mt-10 text-center">
-        <div className="text-3xl mb-3">🔒</div>
-        <p className="text-sm text-slate-400 mb-4">Digite o PIN de admin para editar a liga.</p>
-        <input type="password" value={pinInput} onChange={(e) => setPinInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && unlockAdmin()} className="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-2 text-center outline-none focus:ring-1 focus:ring-amber-500 mb-2" placeholder="PIN" />
-        {pinError && <p className="text-red-400 text-xs mb-2">PIN incorreto.</p>}
-        <button onClick={unlockAdmin} className="w-full bg-amber-400 text-slate-950 font-bold uppercase tracking-wide text-xs py-2 rounded-md hover:bg-amber-300">Entrar</button>
-      </div>
-    );
-  }
-  return (
-    <div className="max-w-md space-y-5">
-      <div>
-        <h2 className="text-xs font-black uppercase tracking-widest text-amber-400 mb-2">Firebase</h2>
-        {secret ? (
-          <p className="text-xs text-emerald-400">Segredo de escrita configurado neste navegador ✓</p>
-        ) : (
-          <div className="space-y-2">
-            <p className="text-xs text-red-400">Sem segredo salvo — você só consegue ler.</p>
-            <input type="password" value={secretInput} onChange={(e) => setSecretInput(e.target.value)} placeholder="Cole o segredo do Realtime Database" className="admin-input" />
-            <button onClick={salvarSecret} className="w-full bg-emerald-950 text-emerald-400 border border-emerald-700 font-bold uppercase tracking-wide text-xs py-2 rounded-md hover:bg-emerald-900">Salvar segredo neste navegador</button>
-          </div>
-        )}
-      </div>
-      <h2 className="text-xs font-black uppercase tracking-widest text-amber-400 pt-2 border-t border-slate-700">Configurações da liga</h2>
-      <Field label="Nome da liga"><input value={config.nomeLiga} onChange={(e) => updateConfig({ nomeLiga: e.target.value })} className="admin-input" /></Field>
-      <Field label="Número de grupos"><input type="number" min={1} max={8} value={config.numGrupos} onChange={(e) => updateConfig({ numGrupos: Math.max(1, Math.min(8, Number(e.target.value) || 1)) })} className="admin-input" /></Field>
-      <Field label="Rodadas na fase classificatória"><input type="number" min={1} value={config.numRodadas} onChange={(e) => updateConfig({ numRodadas: Math.max(1, Number(e.target.value) || 1) })} className="admin-input" /></Field>
-      <Field label="Margem de pontos para empate"><input type="number" min={0} value={config.margemEmpate} onChange={(e) => updateConfig({ margemEmpate: Math.max(0, Number(e.target.value) || 0) })} className="admin-input" /></Field>
-      <Field label="Times com bye direto nas quartas"><input type="number" min={0} value={config.byeCount} onChange={(e) => updateConfig({ byeCount: Math.max(0, Number(e.target.value) || 0) })} className="admin-input" /></Field>
-      <Field label="Pares no playoff (antes das quartas)"><input type="number" min={0} value={config.playoffPairs} onChange={(e) => updateConfig({ playoffPairs: Math.max(0, Number(e.target.value) || 0) })} className="admin-input" /></Field>
-      <Field label="PIN de admin"><input value={config.pin} onChange={(e) => updateConfig({ pin: e.target.value })} className="admin-input" /></Field>
-      <style>{`.admin-input { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px 10px; font-size: 13px; outline: none; color: #f8fafc; } .admin-input:focus { box-shadow: 0 0 0 1px rgba(251,191,36,0.5); }`}</style>
-    </div>
-  );
+    if (!isAdmin) {
+        return (React.createElement("div", { className: "max-w-xs mx-auto mt-10 text-center" },
+            React.createElement("div", { className: "text-3xl mb-3" }, "\uD83D\uDD12"),
+            React.createElement("p", { className: "text-sm text-slate-400 mb-4" }, "Digite o PIN de admin para editar a liga."),
+            React.createElement("input", { type: "password", value: pinInput, onChange: (e) => setPinInput(e.target.value), onKeyDown: (e) => e.key === "Enter" && unlockAdmin(), className: "w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-2 text-center outline-none focus:ring-1 focus:ring-amber-500 mb-2", placeholder: "PIN" }),
+            pinError && React.createElement("p", { className: "text-red-400 text-xs mb-2" }, "PIN incorreto."),
+            React.createElement("button", { onClick: unlockAdmin, className: "w-full bg-amber-400 text-slate-950 font-bold uppercase tracking-wide text-xs py-2 rounded-md hover:bg-amber-300" }, "Entrar")));
+    }
+    return (React.createElement("div", { className: "max-w-md space-y-5" },
+        React.createElement("div", null,
+            React.createElement("h2", { className: "text-xs font-black uppercase tracking-widest text-amber-400 mb-2" }, "Firebase"),
+            secret ? (React.createElement("p", { className: "text-xs text-emerald-400" }, "Segredo de escrita configurado neste navegador \u2713")) : (React.createElement("div", { className: "space-y-2" },
+                React.createElement("p", { className: "text-xs text-red-400" }, "Sem segredo salvo \u2014 voc\u00EA s\u00F3 consegue ler."),
+                React.createElement("input", { type: "password", value: secretInput, onChange: (e) => setSecretInput(e.target.value), placeholder: "Cole o segredo do Realtime Database", className: "admin-input" }),
+                React.createElement("button", { onClick: salvarSecret, className: "w-full bg-emerald-950 text-emerald-400 border border-emerald-700 font-bold uppercase tracking-wide text-xs py-2 rounded-md hover:bg-emerald-900" }, "Salvar segredo neste navegador")))),
+        React.createElement("h2", { className: "text-xs font-black uppercase tracking-widest text-amber-400 pt-2 border-t border-slate-700" }, "Configura\u00E7\u00F5es da liga"),
+        React.createElement(Field, { label: "Nome da liga" },
+            React.createElement("input", { value: config.nomeLiga, onChange: (e) => updateConfig({ nomeLiga: e.target.value }), className: "admin-input" })),
+        React.createElement(Field, { label: "N\u00FAmero de grupos" },
+            React.createElement("input", { type: "number", min: 1, max: 8, value: config.numGrupos, onChange: (e) => updateConfig({ numGrupos: Math.max(1, Math.min(8, Number(e.target.value) || 1)) }), className: "admin-input" })),
+        React.createElement(Field, { label: "Rodadas na fase classificat\u00F3ria" },
+            React.createElement("input", { type: "number", min: 1, value: config.numRodadas, onChange: (e) => updateConfig({ numRodadas: Math.max(1, Number(e.target.value) || 1) }), className: "admin-input" })),
+        React.createElement(Field, { label: "Margem de pontos para empate" },
+            React.createElement("input", { type: "number", min: 0, value: config.margemEmpate, onChange: (e) => updateConfig({ margemEmpate: Math.max(0, Number(e.target.value) || 0) }), className: "admin-input" })),
+        React.createElement(Field, { label: "Times com bye direto nas quartas" },
+            React.createElement("input", { type: "number", min: 0, value: config.byeCount, onChange: (e) => updateConfig({ byeCount: Math.max(0, Number(e.target.value) || 0) }), className: "admin-input" })),
+        React.createElement(Field, { label: "Pares no playoff (antes das quartas)" },
+            React.createElement("input", { type: "number", min: 0, value: config.playoffPairs, onChange: (e) => updateConfig({ playoffPairs: Math.max(0, Number(e.target.value) || 0) }), className: "admin-input" })),
+        React.createElement(Field, { label: "PIN de admin" },
+            React.createElement("input", { value: config.pin, onChange: (e) => updateConfig({ pin: e.target.value }), className: "admin-input" })),
+        React.createElement("style", null, `.admin-input { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px 10px; font-size: 13px; outline: none; color: #f8fafc; } .admin-input:focus { box-shadow: 0 0 0 1px rgba(251,191,36,0.5); }`)));
 }
-
 function Field({ label, children }) {
-  return <div><label className="block text-xs uppercase tracking-wider text-slate-400 mb-1">{label}</label>{children}</div>;
+    return React.createElement("div", null,
+        React.createElement("label", { className: "block text-xs uppercase tracking-wider text-slate-400 mb-1" }, label),
+        children);
 }
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App, null));
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
 </body>
 </html>
