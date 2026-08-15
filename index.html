@@ -28,6 +28,7 @@ const { useState, useEffect, useMemo, useCallback } = React;
 // >>> URL do seu Firebase Realtime Database <<<
 const FIREBASE_URL = "https://uefa-champions-putos-default-rtdb.firebaseio.com";
 const uid = () => Math.random().toString(36).slice(2, 10);
+const fmt = (n) => (n === null || n === undefined ? n : Math.round(n * 100) / 100);
 const TEAMS_SEED = [
     { id: "27746083", nome: "Monique Moura F.C" },
     { id: "4268482", nome: "DONOVAN F.C." },
@@ -142,12 +143,25 @@ function pontosDoTime(pontuacoes, rodada, teamId) {
     const v = r[teamId];
     return v === undefined || v === null ? null : v;
 }
-function calcularClassificacao(teams, fixtures, pontuacoes, config) {
+function rodadaMaisRecenteComDados(pontuacoes) {
+    let max = 0;
+    Object.keys(pontuacoes || {}).forEach((r) => {
+        const rodada = Number(r);
+        const temAlgo = Object.values(pontuacoes[r] || {}).some((v) => v !== null && v !== undefined);
+        if (temAlgo && rodada > max)
+            max = rodada;
+    });
+    return max;
+}
+function calcularClassificacao(teams, fixtures, pontuacoes, config, ateRodada) {
+    const limite = ateRodada === undefined ? Infinity : ateRodada;
     const stats = {};
     teams.forEach((t) => {
         stats[t.id] = { id: t.id, nome: t.nome, grupo: t.grupo, j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, sg: 0, pts: 0 };
     });
     fixtures.forEach((f) => {
+        if (f.rodada > limite)
+            return;
         const ptsA = pontosDoTime(pontuacoes, f.rodada, f.timeA);
         const ptsB = pontosDoTime(pontuacoes, f.rodada, f.timeB);
         if (ptsA == null || ptsB == null)
@@ -312,6 +326,20 @@ function App() {
     }, [secret, pontuacoes]);
     const classGeral = useMemo(() => (data ? calcularClassificacao(data.teams, data.fixtures, pontuacoes, data.config) : []), [data, pontuacoes]);
     const grupos = useMemo(() => (data ? agruparPorGrupo(classGeral, data.config.numGrupos) : {}), [classGeral, data]);
+    const posicoesAnteriores = useMemo(() => {
+        if (!data)
+            return {};
+        const rodadaAtual = rodadaMaisRecenteComDados(pontuacoes);
+        if (rodadaAtual <= 1)
+            return {};
+        const classAnterior = calcularClassificacao(data.teams, data.fixtures, pontuacoes, data.config, rodadaAtual - 1);
+        const gruposAnterior = agruparPorGrupo(classAnterior, data.config.numGrupos);
+        const mapa = {};
+        Object.keys(gruposAnterior).forEach((g) => {
+            gruposAnterior[g].forEach((t, i) => { mapa[t.id] = i + 1; });
+        });
+        return mapa;
+    }, [data, pontuacoes]);
     const salvarSecret = () => {
         if (!secretInput.trim())
             return;
@@ -334,12 +362,12 @@ function App() {
                 React.createElement("div", { className: "max-w-sm w-full text-center" },
                     React.createElement("div", { className: "text-3xl mb-3" }, "\uD83C\uDFC6"),
                     React.createElement("p", { className: "text-sm text-slate-400 mb-4" }, "Conectado ao Firebase, mas ainda n\u00E3o tem dados de liga. Cole o segredo abaixo e inicialize."),
-                    React.createElement("input", { type: "password", value: secretInput, onChange: (e) => setSecretInput(e.target.value), placeholder: "Segredo do Firebase", className: "w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-amber-500 mb-2" }),
+                    React.createElement("input", { type: "password", value: secretInput, onChange: (e) => setSecretInput(e.target.value), placeholder: "Segredo do Firebase", className: "w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-sky-500 mb-2" }),
                     React.createElement("button", { onClick: salvarSecret, className: "w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs font-bold uppercase py-2 rounded-md mb-2" }, "Salvar segredo"),
-                    secret && React.createElement("button", { onClick: inicializarLiga, className: "w-full bg-amber-400 text-slate-950 font-bold uppercase tracking-wide text-xs py-2.5 rounded-md hover:bg-amber-300" }, "Inicializar liga"))));
+                    secret && React.createElement("button", { onClick: inicializarLiga, className: "w-full bg-sky-400 text-slate-950 font-bold uppercase tracking-wide text-xs py-2.5 rounded-md hover:bg-sky-300" }, "Inicializar liga"))));
         }
         return (React.createElement("div", { className: "min-h-screen bg-slate-950 flex items-center justify-center" },
-            React.createElement("div", { className: "text-amber-400 font-black tracking-widest uppercase text-sm animate-pulse" }, "Carregando...")));
+            React.createElement("div", { className: "text-sky-400 font-black tracking-widest uppercase text-sm animate-pulse" }, "Carregando...")));
     }
     const unlockAdmin = () => {
         if (pinInput === data.config.pin) {
@@ -425,7 +453,7 @@ function App() {
     return (React.createElement("div", { className: "min-h-screen bg-slate-950 text-slate-50 font-sans" },
         React.createElement("header", { className: "border-b border-slate-700 bg-slate-900 sticky top-0 z-20" },
             React.createElement("div", { className: "max-w-5xl mx-auto px-4 py-4 flex items-center gap-3" },
-                React.createElement("div", { className: "w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-800 flex items-center justify-center shrink-0 shadow-lg text-lg" }, "\uD83C\uDFC6"),
+                React.createElement("img", { src: "\u00EDcone-192.png", alt: "UFP", className: "w-10 h-10 rounded-full object-cover shrink-0 shadow-[0_0_14px_rgba(56,189,248,0.5)]" }),
                 React.createElement("div", { className: "min-w-0" },
                     React.createElement("h1", { className: "font-black uppercase tracking-wider text-sm sm:text-lg text-slate-50 truncate" }, data.config.nomeLiga),
                     React.createElement("p", { className: "text-xs text-slate-400 uppercase tracking-widest flex items-center gap-1.5" },
@@ -436,24 +464,24 @@ function App() {
                         data.config.numRodadas,
                         " rodadas",
                         React.createElement("span", { className: "text-emerald-400" }, "\u25CF"))),
-                React.createElement("button", { onClick: () => isAdmin ? setIsAdmin(false) : setTab("admin"), className: "ml-auto shrink-0 flex items-center gap-1.5 text-xs uppercase font-bold tracking-wide px-2.5 py-1.5 rounded-md border border-slate-700 text-slate-400 hover:text-amber-400 hover:border-amber-700 transition-colors" },
+                React.createElement("button", { onClick: () => isAdmin ? setIsAdmin(false) : setTab("admin"), className: "ml-auto shrink-0 flex items-center gap-1.5 text-xs uppercase font-bold tracking-wide px-2.5 py-1.5 rounded-md border border-slate-700 text-slate-400 hover:text-sky-400 hover:border-violet-700 transition-colors" },
                     isAdmin ? "🔓" : "🔒",
                     " ",
                     isAdmin ? "Admin" : "Entrar")),
             React.createElement("nav", { className: "max-w-5xl mx-auto px-2 flex overflow-x-auto" }, TABS.map((t) => {
                 const active = tab === t.key;
-                return (React.createElement("button", { key: t.key, onClick: () => setTab(t.key), className: `relative flex items-center gap-1.5 px-3 sm:px-4 py-3 text-xs font-bold uppercase tracking-wide whitespace-nowrap transition-colors ${active ? "text-amber-400" : "text-slate-400 hover:text-slate-50"}` },
+                return (React.createElement("button", { key: t.key, onClick: () => setTab(t.key), className: `relative flex items-center gap-1.5 px-3 sm:px-4 py-3 text-xs font-bold uppercase tracking-wide whitespace-nowrap transition-colors ${active ? "text-sky-400" : "text-slate-400 hover:text-slate-50"}` },
                     React.createElement("span", null, t.icon),
                     t.label,
-                    active && React.createElement("span", { className: "absolute bottom-0 left-2 right-2 h-0.5 bg-amber-400" })));
+                    active && React.createElement("span", { className: "absolute bottom-0 left-2 right-2 h-0.5 bg-sky-400" })));
             }))),
         React.createElement("main", { className: "max-w-5xl mx-auto px-4 py-6 pb-24" },
             tab === "classificacao" && (React.createElement("div", { className: "space-y-8" },
                 gruposDisponiveis.map((g) => (React.createElement("div", { key: g },
-                    data.config.numGrupos > 1 && React.createElement("h2", { className: "text-xs font-black uppercase tracking-widest text-amber-400 mb-2" },
+                    data.config.numGrupos > 1 && React.createElement("h2", { className: "text-xs font-black uppercase tracking-widest text-sky-400 mb-2" },
                         "Grupo ",
                         g),
-                    React.createElement(ClassTable, { rows: grupos[g] || [] })))),
+                    React.createElement(ClassTable, { rows: grupos[g] || [], posicoesAnteriores: posicoesAnteriores })))),
                 classGeral.every((t) => t.j === 0) && React.createElement(EmptyState, { text: "Nenhuma pontua\u00E7\u00E3o lan\u00E7ada ainda para nenhuma rodada." }))),
             tab === "confrontos" && (React.createElement("div", null,
                 React.createElement("div", { className: "flex flex-wrap gap-2 mb-4" },
@@ -468,28 +496,37 @@ function App() {
                 React.createElement(FixturesList, { fixtures: data.fixtures.filter((f) => f.grupo === grupoSel && f.rodada === rodadaSel), teams: data.teams, pontuacoes: pontuacoes, config: data.config, isAdmin: isAdmin, onScoreTeam: setPontuacaoTime }))),
             tab === "matamata" && (React.createElement("div", null,
                 isAdmin && (React.createElement("div", { className: "flex flex-wrap gap-2 mb-5" },
-                    React.createElement("button", { onClick: gerarMataMata, className: "flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-md bg-amber-950 text-amber-400 border border-amber-800 hover:bg-amber-900" }, "\uD83D\uDEE1\uFE0F Gerar chave (da classifica\u00E7\u00E3o atual)"),
+                    React.createElement("button", { onClick: gerarMataMata, className: "flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-md bg-indigo-950 text-sky-400 border border-indigo-800 hover:bg-indigo-900" }, "\uD83D\uDEE1\uFE0F Gerar chave (da classifica\u00E7\u00E3o atual)"),
                     data.playoff && (React.createElement("button", { onClick: propagarVencedores, className: "flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-md border border-slate-700 text-slate-400 hover:text-slate-50" }, "\u25B6 Propagar vencedores")))),
                 !data.playoff && React.createElement(EmptyState, { text: "Chave do mata-mata ainda n\u00E3o foi gerada." }),
                 data.playoff && data.playoff.fases.map((fase, fi) => (React.createElement("div", { key: fase.nome, className: "mb-8" },
-                    React.createElement("h2", { className: "text-xs font-black uppercase tracking-widest text-amber-400 mb-2" }, fase.nome),
+                    React.createElement("h2", { className: "text-xs font-black uppercase tracking-widest text-sky-400 mb-2" }, fase.nome),
                     React.createElement("div", { className: "space-y-2" }, fase.jogos.map((j) => (React.createElement(PlayoffCard, { key: j.id, jogo: j, isAdmin: isAdmin, onScore: (campo, val) => setPlayoffScore(fi, j.id, campo, val) }))))))))),
             tab === "times" && (React.createElement("div", null,
                 isAdmin && (React.createElement("button", { onClick: addTime, className: "flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-md bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900 mb-4" }, "\u2795 Adicionar time")),
                 React.createElement("div", { className: "grid sm:grid-cols-2 gap-2" }, data.teams.map((t) => (React.createElement("div", { key: t.id, className: "flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5" },
-                    isAdmin ? (React.createElement("input", { value: t.nome, onChange: (e) => updateTime(t.id, { nome: e.target.value }), className: "bg-transparent text-sm font-semibold flex-1 outline-none focus:ring-1 focus:ring-amber-500 rounded px-1" })) : (React.createElement("span", { className: "text-sm font-semibold flex-1 truncate" }, t.nome)),
+                    isAdmin ? (React.createElement("input", { value: t.nome, onChange: (e) => updateTime(t.id, { nome: e.target.value }), className: "bg-transparent text-sm font-semibold flex-1 outline-none focus:ring-1 focus:ring-sky-500 rounded px-1" })) : (React.createElement("span", { className: "text-sm font-semibold flex-1 truncate" }, t.nome)),
                     isAdmin && data.config.numGrupos > 1 && (React.createElement("select", { value: t.grupo, onChange: (e) => updateTime(t.id, { grupo: Number(e.target.value) }), className: "bg-slate-900 border border-slate-700 rounded px-1.5 py-1 text-xs" }, gruposDisponiveis.map((g) => React.createElement("option", { key: g, value: g },
                         "G",
                         g)))),
                     isAdmin && React.createElement("button", { onClick: () => removeTime(t.id), className: "text-red-400 hover:text-red-300 shrink-0" }, "\uD83D\uDDD1\uFE0F"))))))),
             tab === "admin" && (React.createElement(AdminPanel, { isAdmin: isAdmin, pinInput: pinInput, setPinInput: setPinInput, pinError: pinError, unlockAdmin: unlockAdmin, config: data.config, updateConfig: updateConfig, secret: secret, secretInput: secretInput, setSecretInput: setSecretInput, salvarSecret: salvarSecret }))),
-        toast && (React.createElement("div", { className: "fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-800 border border-amber-700 text-slate-50 text-xs font-semibold px-4 py-2.5 rounded-lg shadow-xl z-30" }, toast))));
+        toast && (React.createElement("div", { className: "fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-800 border border-violet-700 text-slate-50 text-xs font-semibold px-4 py-2.5 rounded-lg shadow-xl z-30" }, toast))));
 }
 function EmptyState({ text }) {
     return React.createElement("div", { className: "border border-dashed border-slate-700 rounded-lg py-10 px-4 text-center" },
         React.createElement("p", { className: "text-sm text-slate-400" }, text));
 }
-function ClassTable({ rows }) {
+function TrendArrow({ delta }) {
+    if (delta === null || delta === undefined)
+        return React.createElement("span", { className: "text-slate-600 text-xs" }, "•");
+    if (delta === 0)
+        return React.createElement("span", { className: "text-slate-500 text-xs" }, "•");
+    if (delta > 0)
+        return React.createElement("span", { className: "text-emerald-400 text-xs font-bold" }, `\u25B2${delta}`);
+    return React.createElement("span", { className: "text-red-400 text-xs font-bold" }, `\u25BC${Math.abs(delta)}`);
+}
+function ClassTable({ rows, posicoesAnteriores }) {
     if (!rows.length)
         return React.createElement(EmptyState, { text: "Sem times neste grupo." });
     return (React.createElement("div", { className: "overflow-x-auto rounded-lg border border-slate-700" },
@@ -497,6 +534,7 @@ function ClassTable({ rows }) {
             React.createElement("thead", null,
                 React.createElement("tr", { className: "bg-slate-800 text-slate-400 uppercase text-xs tracking-wider" },
                     React.createElement("th", { className: "px-2 py-2 text-left w-8" }, "#"),
+                    React.createElement("th", { className: "px-1 py-2 text-center w-8" }, ""),
                     React.createElement("th", { className: "px-2 py-2 text-left" }, "Time"),
                     React.createElement("th", { className: "px-2 py-2 text-center" }, "J"),
                     React.createElement("th", { className: "px-2 py-2 text-center" }, "V"),
@@ -504,15 +542,20 @@ function ClassTable({ rows }) {
                     React.createElement("th", { className: "px-2 py-2 text-center" }, "D"),
                     React.createElement("th", { className: "px-2 py-2 text-center" }, "SG"),
                     React.createElement("th", { className: "px-2 py-2 text-center font-black" }, "PTS"))),
-            React.createElement("tbody", { className: "font-mono tabular-nums" }, rows.map((t, i) => (React.createElement("tr", { key: t.id, className: `border-t border-slate-700 ${i % 2 === 0 ? "bg-slate-900" : "bg-slate-950"} ${i < 4 ? "border-l-2 border-l-amber-400" : ""}` },
+            React.createElement("tbody", { className: "font-mono tabular-nums" }, rows.map((t, i) => {
+                const posAnterior = posicoesAnteriores ? posicoesAnteriores[t.id] : undefined;
+                const delta = posAnterior ? posAnterior - (i + 1) : null;
+                return (React.createElement("tr", { key: t.id, className: `border-t border-slate-700 ${i % 2 === 0 ? "bg-slate-900" : "bg-slate-950"} ${i < 4 ? "border-l-2 border-l-sky-400" : ""}` },
                 React.createElement("td", { className: "px-2 py-2 text-slate-400 font-sans" }, i + 1),
+                React.createElement("td", { className: "px-1 py-2 text-center" }, React.createElement(TrendArrow, { delta: delta })),
                 React.createElement("td", { className: "px-2 py-2 font-sans font-semibold leading-tight" }, t.nome),
                 React.createElement("td", { className: "px-2 py-2 text-center" }, t.j),
                 React.createElement("td", { className: "px-2 py-2 text-center text-emerald-400" }, t.v),
                 React.createElement("td", { className: "px-2 py-2 text-center text-slate-400" }, t.e),
                 React.createElement("td", { className: "px-2 py-2 text-center text-red-400" }, t.d),
-                React.createElement("td", { className: "px-2 py-2 text-center" }, t.sg > 0 ? `+${t.sg}` : t.sg),
-                React.createElement("td", { className: "px-2 py-2 text-center font-black text-amber-400" }, t.pts))))))));
+                React.createElement("td", { className: "px-2 py-2 text-center" }, t.sg > 0 ? `+${fmt(t.sg)}` : fmt(t.sg)),
+                React.createElement("td", { className: "px-2 py-2 text-center font-black text-sky-400" }, t.pts)));
+            })))));
 }
 function FixturesList({ fixtures, teams, pontuacoes, config, isAdmin, onScoreTeam }) {
     const nome = (id) => { var _a; return ((_a = teams.find((t) => t.id === id)) === null || _a === void 0 ? void 0 : _a.nome) || "?"; };
@@ -522,12 +565,12 @@ function FixturesList({ fixtures, teams, pontuacoes, config, isAdmin, onScoreTea
         const ptsA = pontosDoTime(pontuacoes, f.rodada, f.timeA);
         const ptsB = pontosDoTime(pontuacoes, f.rodada, f.timeB);
         const res = resultadoConfronto(ptsA, ptsB, config.margemEmpate);
-        return (React.createElement("div", { key: f.id, className: "flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-3" },
-            React.createElement("span", { className: `flex-1 text-sm font-semibold leading-tight text-right ${res === "A" ? "text-amber-400" : ""}` }, nome(f.timeA)),
-            isAdmin ? (React.createElement("input", { type: "number", step: "0.01", value: ptsA !== null && ptsA !== void 0 ? ptsA : "", onChange: (e) => onScoreTeam(f.rodada, f.timeA, e.target.value), className: "w-16 bg-slate-900 border border-slate-700 rounded text-center py-1 font-mono text-sm outline-none focus:ring-1 focus:ring-amber-500", placeholder: "\u2014" })) : (React.createElement("span", { className: "w-16 text-center font-mono font-bold text-sm" }, ptsA !== null && ptsA !== void 0 ? ptsA : "—")),
+        return (React.createElement("div", { key: f.id, className: "flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-3 shadow-[0_0_18px_-6px_rgba(56,189,248,0.35)]" },
+            React.createElement("span", { className: `flex-1 text-sm font-semibold leading-tight text-right transition-colors ${res === "A" ? "text-emerald-400 [text-shadow:0_0_10px_rgba(52,211,153,0.6)]" : res === "B" ? "text-red-400 [text-shadow:0_0_10px_rgba(248,113,113,0.5)]" : res === "empate" ? "text-yellow-300 [text-shadow:0_0_10px_rgba(253,224,71,0.5)]" : "text-slate-200"}` }, nome(f.timeA)),
+            isAdmin ? (React.createElement("input", { type: "number", step: "0.01", value: ptsA !== null && ptsA !== void 0 ? ptsA : "", onChange: (e) => onScoreTeam(f.rodada, f.timeA, e.target.value), className: "w-16 bg-slate-900 border border-slate-700 rounded text-center py-1 font-mono text-sm outline-none focus:ring-1 focus:ring-sky-500", placeholder: "\u2014" })) : (React.createElement("span", { className: "w-16 text-center font-mono font-bold text-sm" }, ptsA !== null && ptsA !== void 0 ? fmt(ptsA) : "—")),
             React.createElement("span", { className: "text-slate-400 text-xs shrink-0" }, res === "empate" ? "≈" : "x"),
-            isAdmin ? (React.createElement("input", { type: "number", step: "0.01", value: ptsB !== null && ptsB !== void 0 ? ptsB : "", onChange: (e) => onScoreTeam(f.rodada, f.timeB, e.target.value), className: "w-16 bg-slate-900 border border-slate-700 rounded text-center py-1 font-mono text-sm outline-none focus:ring-1 focus:ring-amber-500", placeholder: "\u2014" })) : (React.createElement("span", { className: "w-16 text-center font-mono font-bold text-sm" }, ptsB !== null && ptsB !== void 0 ? ptsB : "—")),
-            React.createElement("span", { className: `flex-1 text-sm font-semibold leading-tight ${res === "B" ? "text-amber-400" : ""}` }, nome(f.timeB))));
+            isAdmin ? (React.createElement("input", { type: "number", step: "0.01", value: ptsB !== null && ptsB !== void 0 ? ptsB : "", onChange: (e) => onScoreTeam(f.rodada, f.timeB, e.target.value), className: "w-16 bg-slate-900 border border-slate-700 rounded text-center py-1 font-mono text-sm outline-none focus:ring-1 focus:ring-sky-500", placeholder: "\u2014" })) : (React.createElement("span", { className: "w-16 text-center font-mono font-bold text-sm" }, ptsB !== null && ptsB !== void 0 ? fmt(ptsB) : "—")),
+            React.createElement("span", { className: `flex-1 text-sm font-semibold leading-tight transition-colors ${res === "B" ? "text-emerald-400 [text-shadow:0_0_10px_rgba(52,211,153,0.6)]" : res === "A" ? "text-red-400 [text-shadow:0_0_10px_rgba(248,113,113,0.5)]" : res === "empate" ? "text-yellow-300 [text-shadow:0_0_10px_rgba(253,224,71,0.5)]" : "text-slate-200"}` }, nome(f.timeB))));
     })));
 }
 function PlayoffCard({ jogo, isAdmin, onScore }) {
@@ -536,7 +579,7 @@ function PlayoffCard({ jogo, isAdmin, onScore }) {
     return (React.createElement("div", { className: "bg-slate-800 border border-slate-700 rounded-lg px-3 py-3" },
         React.createElement("div", { className: "text-xs uppercase tracking-wider text-slate-400 mb-2" }, jogo.nome),
         React.createElement("div", { className: "flex items-center gap-2 text-sm" },
-            React.createElement("span", { className: `flex-1 font-semibold leading-tight text-right ${venc === "mandante" ? "text-amber-400" : ""}` }, jogo.mandanteNome),
+            React.createElement("span", { className: `flex-1 font-semibold leading-tight text-right ${venc === "mandante" ? "text-sky-400" : ""}` }, jogo.mandanteNome),
             React.createElement(ScoreInput, { value: jogo.ptsIdaA, onChange: (v) => onScore("ptsIdaA", v), isAdmin: isAdmin }),
             React.createElement(ScoreInput, { value: jogo.ptsVoltaA, onChange: (v) => onScore("ptsVoltaA", v), isAdmin: isAdmin }),
             React.createElement("span", { className: "text-xs text-slate-400 w-4 text-center" }, "x"),
@@ -546,38 +589,38 @@ function PlayoffCard({ jogo, isAdmin, onScore }) {
             React.createElement(ScoreInput, { value: jogo.ptsIdaB, onChange: (v) => onScore("ptsIdaB", v), isAdmin: isAdmin }),
             React.createElement(ScoreInput, { value: jogo.ptsVoltaB, onChange: (v) => onScore("ptsVoltaB", v), isAdmin: isAdmin }),
             React.createElement("span", { className: "w-4" }),
-            React.createElement("span", { className: `flex-1 font-semibold leading-tight ${venc === "visitante" ? "text-amber-400" : ""}` }, jogo.visitanteNome)),
+            React.createElement("span", { className: `flex-1 font-semibold leading-tight ${venc === "visitante" ? "text-sky-400" : ""}` }, jogo.visitanteNome)),
         React.createElement("div", { className: "mt-2 text-center text-xs font-mono text-slate-400" },
             "Total: ",
-            React.createElement("span", { className: "font-bold text-slate-50" }, totalA),
+            React.createElement("span", { className: "font-bold text-slate-50" }, fmt(totalA)),
             " x ",
-            React.createElement("span", { className: "font-bold text-slate-50" }, totalB),
+            React.createElement("span", { className: "font-bold text-slate-50" }, fmt(totalB)),
             venc && React.createElement("span", { className: "ml-2 text-emerald-400 font-bold uppercase" },
                 "Avan\u00E7a: ",
                 venc === "mandante" ? jogo.mandanteNome : jogo.visitanteNome))));
 }
 function ScoreInput({ value, onChange, isAdmin }) {
     if (!isAdmin)
-        return React.createElement("span", { className: "w-12 text-center font-mono text-xs" }, value !== null && value !== void 0 ? value : "—");
-    return React.createElement("input", { type: "number", step: "0.01", value: value !== null && value !== void 0 ? value : "", onChange: (e) => onChange(e.target.value === "" ? "" : e.target.value), className: "w-12 bg-slate-900 border border-slate-700 rounded text-center py-1 font-mono text-xs outline-none focus:ring-1 focus:ring-amber-500", placeholder: "\u2014" });
+        return React.createElement("span", { className: "w-12 text-center font-mono text-xs" }, value !== null && value !== void 0 ? fmt(value) : "—");
+    return React.createElement("input", { type: "number", step: "0.01", value: value !== null && value !== void 0 ? value : "", onChange: (e) => onChange(e.target.value === "" ? "" : e.target.value), className: "w-12 bg-slate-900 border border-slate-700 rounded text-center py-1 font-mono text-xs outline-none focus:ring-1 focus:ring-sky-500", placeholder: "\u2014" });
 }
 function AdminPanel({ isAdmin, pinInput, setPinInput, pinError, unlockAdmin, config, updateConfig, secret, secretInput, setSecretInput, salvarSecret }) {
     if (!isAdmin) {
         return (React.createElement("div", { className: "max-w-xs mx-auto mt-10 text-center" },
             React.createElement("div", { className: "text-3xl mb-3" }, "\uD83D\uDD12"),
             React.createElement("p", { className: "text-sm text-slate-400 mb-4" }, "Digite o PIN de admin para editar a liga."),
-            React.createElement("input", { type: "password", value: pinInput, onChange: (e) => setPinInput(e.target.value), onKeyDown: (e) => e.key === "Enter" && unlockAdmin(), className: "w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-2 text-center outline-none focus:ring-1 focus:ring-amber-500 mb-2", placeholder: "PIN" }),
+            React.createElement("input", { type: "password", value: pinInput, onChange: (e) => setPinInput(e.target.value), onKeyDown: (e) => e.key === "Enter" && unlockAdmin(), className: "w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-2 text-center outline-none focus:ring-1 focus:ring-sky-500 mb-2", placeholder: "PIN" }),
             pinError && React.createElement("p", { className: "text-red-400 text-xs mb-2" }, "PIN incorreto."),
-            React.createElement("button", { onClick: unlockAdmin, className: "w-full bg-amber-400 text-slate-950 font-bold uppercase tracking-wide text-xs py-2 rounded-md hover:bg-amber-300" }, "Entrar")));
+            React.createElement("button", { onClick: unlockAdmin, className: "w-full bg-sky-400 text-slate-950 font-bold uppercase tracking-wide text-xs py-2 rounded-md hover:bg-sky-300" }, "Entrar")));
     }
     return (React.createElement("div", { className: "max-w-md space-y-5" },
         React.createElement("div", null,
-            React.createElement("h2", { className: "text-xs font-black uppercase tracking-widest text-amber-400 mb-2" }, "Firebase"),
+            React.createElement("h2", { className: "text-xs font-black uppercase tracking-widest text-sky-400 mb-2" }, "Firebase"),
             secret ? (React.createElement("p", { className: "text-xs text-emerald-400" }, "Segredo de escrita configurado neste navegador \u2713")) : (React.createElement("div", { className: "space-y-2" },
                 React.createElement("p", { className: "text-xs text-red-400" }, "Sem segredo salvo \u2014 voc\u00EA s\u00F3 consegue ler."),
                 React.createElement("input", { type: "password", value: secretInput, onChange: (e) => setSecretInput(e.target.value), placeholder: "Cole o segredo do Realtime Database", className: "admin-input" }),
                 React.createElement("button", { onClick: salvarSecret, className: "w-full bg-emerald-950 text-emerald-400 border border-emerald-700 font-bold uppercase tracking-wide text-xs py-2 rounded-md hover:bg-emerald-900" }, "Salvar segredo neste navegador")))),
-        React.createElement("h2", { className: "text-xs font-black uppercase tracking-widest text-amber-400 pt-2 border-t border-slate-700" }, "Configura\u00E7\u00F5es da liga"),
+        React.createElement("h2", { className: "text-xs font-black uppercase tracking-widest text-sky-400 pt-2 border-t border-slate-700" }, "Configura\u00E7\u00F5es da liga"),
         React.createElement(Field, { label: "Nome da liga" },
             React.createElement("input", { value: config.nomeLiga, onChange: (e) => updateConfig({ nomeLiga: e.target.value }), className: "admin-input" })),
         React.createElement(Field, { label: "N\u00FAmero de grupos" },
