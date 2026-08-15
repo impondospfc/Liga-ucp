@@ -499,7 +499,7 @@ function ClassTable({ rows }) {
                     React.createElement("th", { className: "px-2 py-2 text-center font-black" }, "PTS"))),
             React.createElement("tbody", { className: "font-mono tabular-nums" }, rows.map((t, i) => (React.createElement("tr", { key: t.id, className: `border-t border-slate-700 ${i % 2 === 0 ? "bg-slate-900" : "bg-slate-950"} ${i < 4 ? "border-l-2 border-l-amber-400" : ""}` },
                 React.createElement("td", { className: "px-2 py-2 text-slate-400 font-sans" }, i + 1),
-                React.createElement("td", { className: "px-2 py-2 font-sans font-semibold truncate max-w-36 sm:max-w-none" }, t.nome),
+                React.createElement("td", { className: "px-2 py-2 font-sans font-semibold leading-tight" }, t.nome),
                 React.createElement("td", { className: "px-2 py-2 text-center" }, t.j),
                 React.createElement("td", { className: "px-2 py-2 text-center text-emerald-400" }, t.v),
                 React.createElement("td", { className: "px-2 py-2 text-center text-slate-400" }, t.e),
@@ -516,11 +516,11 @@ function FixturesList({ fixtures, teams, pontuacoes, config, isAdmin, onScoreTea
         const ptsB = pontosDoTime(pontuacoes, f.rodada, f.timeB);
         const res = resultadoConfronto(ptsA, ptsB, config.margemEmpate);
         return (React.createElement("div", { key: f.id, className: "flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-3 py-3" },
-            React.createElement("span", { className: `flex-1 text-sm font-semibold truncate text-right ${res === "A" ? "text-amber-400" : ""}` }, nome(f.timeA)),
+            React.createElement("span", { className: `flex-1 text-sm font-semibold leading-tight text-right ${res === "A" ? "text-amber-400" : ""}` }, nome(f.timeA)),
             isAdmin ? (React.createElement("input", { type: "number", step: "0.01", value: ptsA !== null && ptsA !== void 0 ? ptsA : "", onChange: (e) => onScoreTeam(f.rodada, f.timeA, e.target.value), className: "w-16 bg-slate-900 border border-slate-700 rounded text-center py-1 font-mono text-sm outline-none focus:ring-1 focus:ring-amber-500", placeholder: "\u2014" })) : (React.createElement("span", { className: "w-16 text-center font-mono font-bold text-sm" }, ptsA !== null && ptsA !== void 0 ? ptsA : "—")),
             React.createElement("span", { className: "text-slate-400 text-xs shrink-0" }, res === "empate" ? "≈" : "x"),
             isAdmin ? (React.createElement("input", { type: "number", step: "0.01", value: ptsB !== null && ptsB !== void 0 ? ptsB : "", onChange: (e) => onScoreTeam(f.rodada, f.timeB, e.target.value), className: "w-16 bg-slate-900 border border-slate-700 rounded text-center py-1 font-mono text-sm outline-none focus:ring-1 focus:ring-amber-500", placeholder: "\u2014" })) : (React.createElement("span", { className: "w-16 text-center font-mono font-bold text-sm" }, ptsB !== null && ptsB !== void 0 ? ptsB : "—")),
-            React.createElement("span", { className: `flex-1 text-sm font-semibold truncate ${res === "B" ? "text-amber-400" : ""}` }, nome(f.timeB))));
+            React.createElement("span", { className: `flex-1 text-sm font-semibold leading-tight ${res === "B" ? "text-amber-400" : ""}` }, nome(f.timeB))));
     })));
 }
 function PlayoffCard({ jogo, isAdmin, onScore }) {
@@ -529,7 +529,7 @@ function PlayoffCard({ jogo, isAdmin, onScore }) {
     return (React.createElement("div", { className: "bg-slate-800 border border-slate-700 rounded-lg px-3 py-3" },
         React.createElement("div", { className: "text-xs uppercase tracking-wider text-slate-400 mb-2" }, jogo.nome),
         React.createElement("div", { className: "flex items-center gap-2 text-sm" },
-            React.createElement("span", { className: `flex-1 font-semibold truncate text-right ${venc === "mandante" ? "text-amber-400" : ""}` }, jogo.mandanteNome),
+            React.createElement("span", { className: `flex-1 font-semibold leading-tight text-right ${venc === "mandante" ? "text-amber-400" : ""}` }, jogo.mandanteNome),
             React.createElement(ScoreInput, { value: jogo.ptsIdaA, onChange: (v) => onScore("ptsIdaA", v), isAdmin: isAdmin }),
             React.createElement(ScoreInput, { value: jogo.ptsVoltaA, onChange: (v) => onScore("ptsVoltaA", v), isAdmin: isAdmin }),
             React.createElement("span", { className: "text-xs text-slate-400 w-4 text-center" }, "x"),
@@ -539,7 +539,7 @@ function PlayoffCard({ jogo, isAdmin, onScore }) {
             React.createElement(ScoreInput, { value: jogo.ptsIdaB, onChange: (v) => onScore("ptsIdaB", v), isAdmin: isAdmin }),
             React.createElement(ScoreInput, { value: jogo.ptsVoltaB, onChange: (v) => onScore("ptsVoltaB", v), isAdmin: isAdmin }),
             React.createElement("span", { className: "w-4" }),
-            React.createElement("span", { className: `flex-1 font-semibold truncate ${venc === "visitante" ? "text-amber-400" : ""}` }, jogo.visitanteNome)),
+            React.createElement("span", { className: `flex-1 font-semibold leading-tight ${venc === "visitante" ? "text-amber-400" : ""}` }, jogo.visitanteNome)),
         React.createElement("div", { className: "mt-2 text-center text-xs font-mono text-slate-400" },
             "Total: ",
             React.createElement("span", { className: "font-bold text-slate-50" }, totalA),
