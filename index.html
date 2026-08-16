@@ -7,8 +7,11 @@
 <link rel="manifest" href="manifest.json" />
 <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png" />
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
 <meta name="theme-color" content="#0f172a" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Liga UFP" />
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -30,32 +33,32 @@ const FIREBASE_URL = "https://uefa-champions-putos-default-rtdb.firebaseio.com";
 const uid = () => Math.random().toString(36).slice(2, 10);
 const fmt = (n) => (n === null || n === undefined ? n : Math.round(n * 100) / 100);
 const TEAMS_SEED = [
-    { id: "27746083", nome: "Monique Moura F.C" },
-    { id: "4268482", nome: "DONOVAN F.C." },
-    { id: "776045", nome: "PARANA CLUBE PG" },
-    { id: "13990982", nome: "SAF VK Phone" },
-    { id: "4749372", nome: "LAVINI SPFC" },
-    { id: "555279", nome: "Fatique FC" },
-    { id: "2182848", nome: "Dalmo&Arthur" },
-    { id: "1785663", nome: "Saint Pablo SPFC" },
-    { id: "44741890", nome: "Real Mauadri" },
-    { id: "95344", nome: "Ayrton Senna Eterno F. C." },
-    { id: "26771693", nome: "Mariotio FC" },
-    { id: "2515690", nome: "SAMURAI F.C." },
-    { id: "702112", nome: "F.C.COM NOS NINGUEM PODE" },
-    { id: "3208913", nome: "CORAGEM 2015" },
-    { id: "15442388", nome: "C.A. MALAAS" },
+    { id: "1785663", nome: "Monique Moura F.C" },
+    { id: "95344", nome: "DONOVAN F.C." },
+    { id: "8176909", nome: "PARANA CLUBE PG" },
+    { id: "776045", nome: "SAF VK Phone" },
+    { id: "51028350", nome: "LAVINI SPFC" },
+    { id: "702112", nome: "Fatique FC" },
+    { id: "555279", nome: "Dalmo&Arthur" },
+    { id: "50846102", nome: "Saint Pablo SPFC" },
+    { id: "4749372", nome: "Real Mauadri" },
+    { id: "2658666", nome: "Ayrton Senna Eterno F. C." },
+    { id: "18930543", nome: "Mariotio FC" },
+    { id: "1682666", nome: "SAMURAI F.C." },
+    { id: "18064977", nome: "F.C.COM NOS NINGUEM PODE" },
+    { id: "44741890", nome: "CORAGEM 2015" },
+    { id: "13990982", nome: "C.A. MALAAS" },
     { id: "30073408", nome: "Sport Club Mestre Chimba" },
-    { id: "3845725", nome: "Impondo Azul" },
-    { id: "1682666", nome: "Sep Palmeirinhas FC" },
-    { id: "2658666", nome: "Gandula Centroavante FC" },
-    { id: "4077185", nome: "SEP PALMEIRAS 19I4" },
-    { id: "50846102", nome: "MeuVerde Eli" },
-    { id: "8176909", nome: "Avalanxe FC" },
-    { id: "18064977", nome: "todenovo f.c" },
-    { id: "51028350", nome: "sep fut maua" },
-    { id: "45850044", nome: "lcferreira 18 fc" },
-    { id: "18930543", nome: "tricolormarcosfc" },
+    { id: "27746083", nome: "Impondo Azul" },
+    { id: "4077185", nome: "Sep Palmeirinhas FC" },
+    { id: "3845725", nome: "Gandula Centroavante FC" },
+    { id: "3208913", nome: "SEP PALMEIRAS 19I4" },
+    { id: "45850044", nome: "MeuVerde Eli" },
+    { id: "4268482", nome: "Avalanxe FC" },
+    { id: "2182848", nome: "todenovo f.c" },
+    { id: "2515690", nome: "sep fut maua" },
+    { id: "15442388", nome: "lcferreira 18 fc" },
+    { id: "26771693", nome: "tricolormarcosfc" },
 ];
 const FIXTURES_R1_A_R8 = [
     [["SEP PALMEIRAS 19I4", "lcferreira 18 fc"], ["Gandula Centroavante FC", "PARANA CLUBE PG"], ["Avalanxe FC", "Impondo Azul"], ["Fatique FC", "tricolormarcosfc"], ["Mariotio FC", "Sep Palmeirinhas FC"], ["CORAGEM 2015", "Monique Moura F.C"], ["Dalmo&Arthur", "SAMURAI F.C."], ["C.A. MALAAS", "Real Mauadri"], ["MeuVerde Eli", "Saint Pablo SPFC"], ["todenovo f.c", "sep fut maua"], ["DONOVAN F.C.", "SAF VK Phone"], ["Ayrton Senna Eterno F. C.", "Sport Club Mestre Chimba"], ["F.C.COM NOS NINGUEM PODE", "LAVINI SPFC"]],
@@ -276,17 +279,30 @@ function App() {
         let cancelled = false;
         const load = async () => {
             try {
-                const [liga, pts] = await Promise.all([fbGet("liga"), fbGet("pontuacoes")]);
-                if (cancelled)
-                    return;
+                let liga = null;
+                let pts = {};
+
+                try {
+                    liga = await fbGet("liga");
+                } catch (e) {
+                    // 404 ou liga ainda não existe → trata como sem dados
+                    liga = null;
+                }
+
+                try {
+                    pts = await fbGet("pontuacoes") || {};
+                } catch (e) {
+                    pts = {};
+                }
+
+                if (cancelled) return;
+
                 setData(liga && liga.config ? liga : null);
-                setPontuacoes(pts || {});
+                setPontuacoes(pts);
                 setConnStatus("ok");
                 setConnMsg("");
-            }
-            catch (e) {
-                if (cancelled)
-                    return;
+            } catch (e) {
+                if (cancelled) return;
                 setConnStatus("error");
                 setConnMsg(String(e.message || e));
             }
