@@ -147,7 +147,7 @@ function pontosDoTime(pontuacoes, rodada, teamId) {
     return v === undefined || v === null ? null : v;
 }
 function rodadaMaisRecenteComDados(pontuacoes) {
-    let max = 0;
+    let max = 1;
     Object.keys(pontuacoes || {}).forEach((r) => {
         const rodada = Number(r);
         const temAlgo = Object.values(pontuacoes[r] || {}).some((v) => v !== null && v !== undefined);
@@ -271,7 +271,10 @@ function App() {
     const [isAdmin, setIsAdmin] = useState(false);
     const [pinInput, setPinInput] = useState("");
     const [pinError, setPinError] = useState(false);
+    
+    // Seleção de rodada inteligente dinâmica
     const [rodadaSel, setRodadaSel] = useState(1);
+    
     const [grupoSel, setGrupoSel] = useState(1);
     const [toast, setToast] = useState("");
     const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2500); };
@@ -285,7 +288,6 @@ function App() {
                 try {
                     liga = await fbGet("liga");
                 } catch (e) {
-                    // 404 ou liga ainda não existe → trata como sem dados
                     liga = null;
                 }
 
@@ -301,6 +303,10 @@ function App() {
                 setPontuacoes(pts);
                 setConnStatus("ok");
                 setConnMsg("");
+
+                // Puxa direto para a rodada mais recente com dados ativos
+                const maxR = rodadaMaisRecenteComDados(pts);
+                setRodadaSel(maxR);
             } catch (e) {
                 if (cancelled) return;
                 setConnStatus("error");
