@@ -542,7 +542,7 @@ function App() {
                     isAdmin && React.createElement("button", { onClick: () => removeTime(t.id), className: "text-red-400 hover:text-red-300 shrink-0" }, "\uD83D\uDDD1\uFE0F")))))),
 
             tab === "admin" && (React.createElement(AdminPanel, { isAdmin: isAdmin, pinInput: pinInput, setPinInput: setPinInput, pinError: pinError, unlockAdmin: unlockAdmin, config: data.config, updateConfig: updateConfig, secret: secret, secretInput: secretInput, setSecretInput: setSecretInput, salvarSecret: salvarSecret }))),
-        toast && (React.createElement("div", { className: "fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-800 border border-violet-700 text-slate-50 text-xs font-semibold px-4 py-2.5 rounded-lg shadow-xl z-30" }, toast))));
+        toast && (React.createElement("div", { className: "fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-800 border border-violet-700 text-slate-50 text-xs font-semibold px-4 py-2.5 rounded-lg shadow-xl z-30" }, toast))))));
 }
 
 function EmptyState({ text }) {
