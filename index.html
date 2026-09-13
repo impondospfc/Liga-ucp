@@ -260,29 +260,54 @@ async function compartilharElementoPNG(el, nomeArquivo) {
         alert("Não foi possível gerar a imagem.");
         return;
     }
-    const canvas = await html2canvas(el, {
-        backgroundColor: "#020617",
-        scale: 2,
-        useCORS: true,
-        logging: false,
-    });
-    const blob = await new Promise((res) => canvas.toBlob(res, "image/png"));
-    if (!blob) return;
-    const file = new File([blob], nomeArquivo, { type: "image/png" });
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-            await navigator.share({ files: [file], title: "UEFA Champions Putos" });
-            return;
-        } catch (e) {
-            if (e && e.name === "AbortError") return;
+    const prev = {
+        width: el.style.width,
+        maxWidth: el.style.maxWidth,
+        overflow: el.style.overflow,
+    };
+    const fullW = Math.max(el.scrollWidth, el.offsetWidth, 380);
+    el.style.width = fullW + "px";
+    el.style.maxWidth = "none";
+    el.style.overflow = "visible";
+    el.querySelectorAll("table, .overflow-x-auto, div").forEach(function (n) {
+        if (n.classList && n.classList.contains("overflow-x-auto")) {
+            n.style.overflow = "visible";
+            n.style.maxWidth = "none";
         }
+    });
+    try {
+        const canvas = await html2canvas(el, {
+            backgroundColor: "#020617",
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            width: fullW,
+            windowWidth: fullW + 24,
+            scrollX: 0,
+            scrollY: -window.scrollY,
+        });
+        const blob = await new Promise(function (res) { canvas.toBlob(res, "image/png"); });
+        if (!blob) return;
+        const file = new File([blob], nomeArquivo, { type: "image/png" });
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share({ files: [file], title: "UEFA Champions Putos" });
+                return;
+            } catch (e) {
+                if (e && e.name === "AbortError") return;
+            }
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = nomeArquivo;
+        a.click();
+        URL.revokeObjectURL(url);
+    } finally {
+        el.style.width = prev.width;
+        el.style.maxWidth = prev.maxWidth;
+        el.style.overflow = prev.overflow;
     }
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = nomeArquivo;
-    a.click();
-    URL.revokeObjectURL(url);
 }
 
 const TABS = [
@@ -494,7 +519,7 @@ function App() {
             tab === "classificacao" && (React.createElement("div", { className: "space-y-4" },
                 React.createElement("div", { className: "flex justify-end" },
                     React.createElement("button", { onClick: shareClass, className: "text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-md border border-slate-700 text-slate-300 hover:text-sky-400 hover:border-sky-700" }, "📤 Compartilhar PNG")),
-                React.createElement("div", { ref: classRef, className: "space-y-8 bg-slate-950 p-2 rounded-lg" },
+                React.createElement("div", { ref: classRef, className: "space-y-8 bg-slate-950 p-3 rounded-lg", style: { minWidth: "360px" } },
                     React.createElement("div", { className: "text-center pb-2" },
                         React.createElement("p", { className: "text-xs font-black uppercase tracking-widest text-sky-400" }, data.config.nomeLiga),
                         React.createElement("p", { className: "text-[10px] text-slate-500 uppercase" }, "Classificação")),
@@ -559,8 +584,8 @@ function TrendArrow({ delta }) {
 
 function ClassTable({ rows, posicoesAnteriores }) {
     if (!rows.length) return React.createElement(EmptyState, { text: "Sem times neste grupo." });
-    return (React.createElement("div", { className: "overflow-x-auto rounded-lg border border-slate-700" },
-        React.createElement("table", { className: "w-full text-xs sm:text-sm" },
+    return (React.createElement("div", { className: "overflow-x-auto rounded-lg border border-slate-700", style: { WebkitOverflowScrolling: "touch" } },
+        React.createElement("table", { className: "w-full text-xs sm:text-sm", style: { minWidth: "340px", tableLayout: "fixed" } },
             React.createElement("thead", null,
                 React.createElement("tr", { className: "bg-slate-800 text-slate-400 uppercase text-xs tracking-wider" },
                     React.createElement("th", { className: "px-2 py-2 text-left w-8" }, "#"),
@@ -571,7 +596,7 @@ function ClassTable({ rows, posicoesAnteriores }) {
                     React.createElement("th", { className: "px-2 py-2 text-center" }, "E"),
                     React.createElement("th", { className: "px-2 py-2 text-center" }, "D"),
                     React.createElement("th", { className: "px-2 py-2 text-center" }, "SG"),
-                    React.createElement("th", { className: "px-2 py-2 text-center font-black" }, "PTS"))),
+                    React.createElement("th", { className: "px-3 py-2 text-center font-black", style: { minWidth: "42px" } }, "PTS"))),
             React.createElement("tbody", { className: "font-mono tabular-nums" }, rows.map((t, i) => {
                 const posAnterior = posicoesAnteriores ? posicoesAnteriores[t.id] : undefined;
                 const delta = posAnterior ? posAnterior - (i + 1) : null;
@@ -584,7 +609,7 @@ function ClassTable({ rows, posicoesAnteriores }) {
                     React.createElement("td", { className: "px-2 py-2 text-center text-slate-400" }, t.e),
                     React.createElement("td", { className: "px-2 py-2 text-center text-red-400" }, t.d),
                     React.createElement("td", { className: "px-2 py-2 text-center" }, t.sg > 0 ? `+${fmt(t.sg)}` : fmt(t.sg)),
-                    React.createElement("td", { className: "px-2 py-2 text-center font-black text-sky-400" }, t.pts)));
+                    React.createElement("td", { className: "px-3 py-2 text-center font-black text-sky-400", style: { minWidth: "42px" } }, t.pts)));
             })))));
 }
 
